@@ -1,0 +1,191 @@
+/* Base styles */
+.analysis-container {
+    padding: 24px;
+    /* background-color: #1a1a1a; */
+    min-height: 100vh;
+    color: #e0e0e0;
+  }
+  
+  /* Header controls */
+  .header-controls {
+    display: flex;
+    margin-bottom: 24px;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+  }
+  
+  .model-selector {
+    width: 200px;
+  }
+  
+  .model-selector .ant-select-selector {
+    background-color: #2a2a2a !important;
+    border-color: #444 !important;
+    color: #e0e0e0 !important;
+  }
+  
+  .upload-btn, .export-btn {
+    background-color: #1890ff;
+    border-color: #1890ff;
+  }
+  /* Cards grid */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(500px, 1.5fr));
+    gap: 20px;
+  }
+  
+  /* Card styles */
+  .analysis-card {
+    background-color: #2a2a2a;
+    border-color: #444;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .analysis-card .ant-card-body {
+    padding: 0;
+    height: 100%;
+  }
+  
+  .card-content {
+    display: flex;
+    height: 100%;
+  }
+  
+  /* Image section */
+  .image-section {
+    flex: 1;
+    position: relative;
+    min-height: 240px;
+    background-color: #1a1a1a;
+  }
+  
+  .image-section img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  
+  .image-actions {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .action-btn {
+    width: 32px;
+    height: 32px;
+    background: rgba(0, 0, 0, 0.7) !important;
+    border: none !important;
+    color: white !important;
+    border-radius: 50% !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* .action-btn:hover {
+    background: rgba(0, 0, 0, 0.9) !important;
+  } */
+  
+  /* Data section */
+  .data-section {
+    flex: 1;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .meta-field {
+    margin-bottom: 8px;
+    color: #a0a0a0;
+  }
+  
+  .meta-field span {
+    color: #e0e0e0;
+    font-weight: 500;
+    margin-right: 8px;
+  }
+  
+  /* Analysis buttons */
+  .analysis-buttons {
+    display: flex;
+    gap: 8px;
+    margin: 16px 0;
+  }
+  
+  .analysis-btn {
+    flex: 1;
+  }
+  
+  /* Bug fields */
+  .bug-fields {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #444;
+  }
+  
+  .form-field {
+    margin-bottom: 16px;
+  }
+  
+  .form-field label {
+    display: block;
+    margin-bottom: 8px;
+    color: #a0a0a0;
+    font-size: 14px;
+  }
+  
+  .input-field {
+    background-color: #1a1a1a !important;
+    border-color: #444 !important;
+    color: #e0e0e0 !important;
+  }
+  
+  /* .input-field:hover, .input-field:focus {
+    border-color: #1890ff !important;
+  } */
+  
+  /* Modal styles */
+  .ant-modal-content {
+    background-color: #2a2a2a !important;
+  }
+  
+  .ant-modal-close {
+    color: #e0e0e0 !important;
+  }
+
+  /* .ant-select-item-option-selected {
+    background-color: #1890ff !important;
+    color: white !important;
+  }
+  
+  .ant-select-item-option-selected:hover {
+    background-color: #40a9ff !important;
+  } */
+  
+  /* Responsive adjustments */
+  @media (max-width: 1200px) {
+    .cards-grid {
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .cards-grid {
+      grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+    }
+    
+    .card-content {
+      flex-direction: column;
+    }
+    
+    .image-section {
+      min-height: 200px;
+    }
+  }

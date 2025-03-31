@@ -1,0 +1,234 @@
+/* styles.css */
+body {
+    background-color: #000;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.logo {
+    color: #fff;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    padding: 20px;
+}
+
+.ant-layout-sider {
+    border-right: 1px solid #333;
+}
+
+.ant-menu-dark {
+    background: #000 !important;
+    border-right: none;
+}
+
+.ant-menu-dark .ant-menu-item {
+    color: #aaa;
+}
+
+.ant-menu-dark .ant-menu-item-selected {
+    background-color: #222 !important;
+    color: #fff !important;
+}
+
+.ant-layout-header {
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    border-bottom: 1px solid #333;
+}
+
+h1 {
+    font-size: 24px;
+}
+
+/* Change submenu background color to black */
+.ant-menu-sub {
+    background-color: #000 !important;
+}
+
+/* Ensure submenu items also have a black background */
+.ant-menu-item {
+    background-color: #000 !important;
+    color: #fff !important;
+}
+
+/* Change submenu hover effect */
+.ant-menu-item:hover {
+    background-color: #111 !important;
+}
+
+/* Main container */
+.dark-app-container {
+    max-width: 800px;
+    margin: 0 250px;
+    padding: 20px;
+}
+
+/* Card styling */
+.dark-form-card {
+    background: #111111;
+    border-radius: 8px;
+    padding: 30px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    border: 1px solid #333;
+}
+
+.dark-form-title {
+    color: #e0e0e0;
+    font-size: 22px;
+    margin-bottom: 25px;
+    font-weight: 600;
+    text-align: center;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.dark-form-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Input group styling */
+.dark-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.dark-input-label {
+    color: #aaa;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.dark-input-hint {
+    color: #555;
+    font-size: 11px;
+    margin-top: -10px;
+    margin-bottom: 5px;
+    font-style: italic;
+}
+
+/* Select input styling */
+.dark-styled-select .ant-select-selector {
+    background: #1a1a1a !important;
+    border: 1px solid #333 !important;
+    color: #e0e0e0 !important;
+    height: 42px !important;
+    border-radius: 4px !important;
+    padding: 0 12px !important;
+}
+
+.dark-styled-select .ant-select-selection-placeholder {
+    color: #555 !important;
+}
+
+.dark-styled-select:hover .ant-select-selector {
+    border-color: #444 !important;
+}
+
+.dark-styled-select:focus-within .ant-select-selector {
+    border-color: #666 !important;
+    box-shadow: 0 0 0 2px rgba(100, 100, 100, 0.2) !important;
+}
+
+.dark-dropdown-icon {
+    color: #666 !important;
+    font-size: 12px;
+}
+
+/* Dropdown menu */
+.dark-dropdown-menu {
+    background: #1a1a1a !important;
+    border: 1px solid #333 !important;
+    border-radius: 4px !important;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5) !important;
+    padding: 5px 0 !important;
+}
+
+.dark-dropdown-menu .ant-select-item {
+    color: #e0e0e0 !important;
+    padding: 10px 16px !important;
+}
+
+.dark-dropdown-menu .ant-select-item:hover {
+    background: #222 !important;
+}
+
+.dark-dropdown-menu .ant-select-item-option-selected {
+    background: #252525 !important;
+    color: #fff !important;
+    font-weight: 500;
+}
+
+.dark-option-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.dark-option-icon {
+    color: #666;
+    font-size: 13px;
+}
+
+/* Textarea styling */
+.dark-styled-textarea {
+    background: #1a1a1a !important;
+    border: 1px solid #333 !important;
+    color: #e0e0e0 !important;
+    border-radius: 4px !important;
+    padding: 12px !important;
+    resize: vertical;
+}
+
+.dark-styled-textarea:hover {
+    border-color: #444 !important;
+}
+
+.dark-styled-textarea:focus {
+    border-color: #666 !important;
+    box-shadow: 0 0 0 2px rgba(100, 100, 100, 0.2) !important;
+}
+
+/* Button styling */
+.dark-submit-btn {
+    background: #1890ff !important;
+    border: 1px solid #444 !important;
+    height: 44px !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    border-radius: 4px !important;
+    margin-top: 10px !important;
+    color: #e0e0e0 !important;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.2s ease !important;
+}
+
+.dark-submit-btn:hover {
+    background: #1890ff !important;
+    border-color: #555 !important;
+    color: #fff !important;
+}
+
+.dark-submit-btn:active {
+    background: #2a2a2a !important;
+}
+
+.dark-submit-btn .anticon {
+    color: #999 !important;
+}
+  
+  
+  
