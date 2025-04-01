@@ -178,7 +178,7 @@ const Analysis = () => {
                 onCancel={() => setIsPreviewVisible(false)}
                 centered
                 width="auto"
-                bodyStyle={{
+                style={{
                     padding: 0,
                     display: 'flex',
                     justifyContent: 'center',
