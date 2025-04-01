@@ -230,5 +230,8 @@ h1 {
     color: #999 !important;
 }
   
-  
+.placeholder-white::placeholder {
+    color: white;
+    opacity: 1;
+}
   

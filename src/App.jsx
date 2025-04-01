@@ -10,12 +10,15 @@ import FileModelTest from './pages/FileModelTest.jsx'
 import Analysis from "./pages/Analysis.jsx";
 import HomePage from "./pages/HomePage.jsx";
 
+import { Toaster } from 'react-hot-toast'
+
 const { Content } = Layout;
 
 const App = () => {
   return (
     <Layout style={{ minHeight: "100vh" }}>
-      <Sidebar/>
+      <Toaster />
+      <Sidebar />
       <Layout>
         <Content style={{ padding: "20px", background: "#111", color: "#fff" }}>
           <Routes>

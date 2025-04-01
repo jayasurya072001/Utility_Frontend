@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState, version } from "react";
 import { Select, Input, Button } from "antd";
 import { 
     CaretDownOutlined, 
@@ -6,22 +6,25 @@ import {
     CodeOutlined, 
     ThunderboltOutlined 
 } from '@ant-design/icons';
-import '../styles.css'
 
+import '../styles.css';
+import { fetchModels, startProcess } from "../util-api/api";
+import toast from 'react-hot-toast';
 
 const { Option } = Select;
 
-// Mock data for models and versions
-const modelsData = {
-    "Model A": ["v1.0", "v1.1", "v1.2"],
-    "Model B": ["v2.0", "v2.1"],
-    "Model C": ["v3.0", "v3.1", "v3.2", "v3.3"],
-};
-
 const FreshLoadTest = () => {
+    const [modelsData, setModelsData] = useState({});
     const [selectedModel, setSelectedModel] = useState(null);
     const [selectedVersion, setSelectedVersion] = useState(null);
-    const [emails, setEmails] = useState("");
+    const [emails, setEmails] = useState([]);
+
+    useEffect(() => {
+        const init = async () => {
+            setModelsData(await fetchModels())
+        }
+        init()
+    }, [fetchModels, setModelsData])
 
     // Handle model change
     const handleModelChange = (value) => {
@@ -29,12 +32,30 @@ const FreshLoadTest = () => {
         setSelectedVersion(null); // Reset version on model change
     };
 
+    const handleEmailChange = useCallback((e) => {
+        setEmails(e)
+    }, [setEmails])
+
     // Handle form submission
-    const handleSubmit = () => {
-        console.log("Model:", selectedModel);
-        console.log("Version:", selectedVersion);
-        console.log("Emails:", emails);
-    };
+
+    const handleSubmit = useCallback(async () => {
+        const response = await startProcess(selectedVersion, selectedModel, emails)
+        
+        if(response.status == 202 || response.status == 200){
+            toast.success(response.data?.message || "Process Started")
+        } else if(response.status == 409 || response.status == 400) {
+            console.log(response.data)
+            toast.error(response.data.message)
+            if(response.status == 400){
+
+                response?.data?.errors?.map((each, i) => {
+                    toast.error(each)
+                })
+            }
+        } else {
+            toast.error("Cannot Start Process")
+        }
+    }, [selectedVersion, selectedModel, emails])
 
     return (
         <div className="dark-app-container">
@@ -50,7 +71,7 @@ const FreshLoadTest = () => {
                             onChange={handleModelChange}
                             value={selectedModel}
                             suffixIcon={<CaretDownOutlined className="dark-dropdown-icon" />}
-                            dropdownClassName="dark-dropdown-menu"
+                            // dropdownClassName="dark-dropdown-menu"
                         >
                             {Object.keys(modelsData).map((model) => (
                                 <Option key={model} value={model}>
@@ -73,7 +94,7 @@ const FreshLoadTest = () => {
                             onChange={setSelectedVersion}
                             disabled={!selectedModel}
                             suffixIcon={<CaretDownOutlined className="dark-dropdown-icon" />}
-                            dropdownClassName="dark-dropdown-menu"
+                            // dropdownClassName="dark-dropdown-menu"
                         >
                             {selectedModel &&
                                 modelsData[selectedModel].map((version) => (
@@ -90,14 +111,14 @@ const FreshLoadTest = () => {
                     {/* Gmail Input */}
                     <div className="dark-input-group">
                         <label className="dark-input-label">Email Addresses</label>
-                        <Input.TextArea
-                            placeholder="user1@example.com, user2@example.com"
-                            className="dark-styled-textarea"
+                        <Select
+                            mode="tags"
+                            placeholder="Enter email addresses..."
+                            className="dark-styled-select"
                             value={emails}
-                            onChange={(e) => setEmails(e.target.value)}
-                            rows={4}
+                            onChange={handleEmailChange}
                         />
-                        <div className="dark-input-hint">Separate multiple emails with commas</div>
+                        <div className="dark-input-hint">Press Enter to add multiple emails</div>
                     </div>
     
                     {/* Submit Button */}
