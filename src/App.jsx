@@ -14,6 +14,8 @@ import { Toaster } from 'react-hot-toast';
 import LoginPage from "./pages/LoginPage.jsx";
 import SignupPage from "./pages/SignUpPage.jsx";
 import AdminLoginPage from "./pages/AdminLoginPage.jsx";
+import Chunks from "./pages/Chunks.jsx";
+import ChunkAnalysis from "./pages/ChunkAnalysis.jsx";
 
 const { Content } = Layout;
 
@@ -98,7 +100,8 @@ const App = () => {
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/fresh-load" element={<FreshLoadTest />} />
             <Route path="/analysis-verification" element={<AnalysisVerification />} />
-            <Route path="/analysis" element={<Analysis />} />
+            <Route path="/analysis" element={<Chunks />} />
+            <Route path="/analysis/:chunk" element={<ChunkAnalysis />} />
             <Route path="/regression-load" element={<RegressionLoadTest />} />
             <Route path="/urlmodel-test" element={<UrlModelTest />} />
             <Route path="/file-upload" element={<FileModelTest />} />

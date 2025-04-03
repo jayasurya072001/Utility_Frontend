@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Card, Button, Select, Input, Typography, message } from 'antd';
 import { ExpandOutlined, LinkOutlined } from '@ant-design/icons';
 import '../css/analysis-card.css'
+import axios from 'axios';
 
 const { Text } = Typography;
 const { Option } = Select;
@@ -9,6 +10,30 @@ const { TextArea } = Input;
 
 const AnalysisCard = ({ data, onUpdate, expectedClasses, analysts, onPreview }) => {
     const [localData, setLocalData] = useState(data);
+    const [predictionClasses, setPredictionClasses] = useState(null)
+    const [reproducedUrls, setReproducedUrls] = useState([])
+
+    useEffect(() => {
+        try{
+            const detectionString = data['Predicted Classes']
+
+            // Convert single quotes to double quotes
+            const jsonFormattedString = detectionString.replace(/'/g, '"');
+
+            // Parse as JSON
+            let detectionObject;
+            try {
+                detectionObject = JSON.parse(jsonFormattedString);
+                setPredictionClasses(detectionObject)
+            } catch (error) {
+                console.error("Error parsing JSON:", error);
+            }
+
+        } catch(e) {
+            console.error(e)
+            console.log(data["Predicted Classes"])
+        }
+    }, [data, setPredictionClasses])
 
     const handleChange = (field, value) => {
         const updated = { ...localData, [field]: value };
@@ -52,12 +77,26 @@ const AnalysisCard = ({ data, onUpdate, expectedClasses, analysts, onPreview }) 
         }, 1500);
     };
 
+    const validate = useCallback(async () => {
+        response = await axios.post("http://localhost:5000/utilities/analysis/proof-validation", {
+            "imageURL": data["inputMediaUrl"],
+            "expectedClasses": [],
+            "reproducedUrls": []
+        })
+
+        console.log("Validation Response", response)
+    }, [data, reproducedUrls])
+
+    const handleReproducedUrlChange = useCallback((e) => {
+        setReproducedUrls(e)
+    }, [setReproducedUrls])
+
     return (
         <Card className="analysis-card">
             <div className="card-content">
                 <div className="image-section">
                     <img
-                        src={data.inputMediaUrl}
+                        src={data["inputMediaUrl"]}
                         alt="Media preview"
                         onError={(e) => {
                             e.target.onerror = null;
@@ -67,7 +106,7 @@ const AnalysisCard = ({ data, onUpdate, expectedClasses, analysts, onPreview }) 
                     <div className="image-actions">
                         <Button
                             icon={<ExpandOutlined />}
-                            onClick={() => onPreview(data.inputMediaUrl)}
+                            onClick={() => onPreview(data["inputMediaUrl"])}
                             className="action-btn"
                         />
                         <Button
@@ -79,10 +118,10 @@ const AnalysisCard = ({ data, onUpdate, expectedClasses, analysts, onPreview }) 
                 </div>
 
                 <div className="data-section">
-                    <Text className="meta-field"><span>Result:</span> {data.Result || '-'}</Text>
+                    <Text className="meta-field"><span>Result:</span> {data["Result"] || '-'}</Text>
                     <Text className="meta-field"><span>Projection:</span> {data['Projection Layer'] || '-'}</Text>
                     <Text className="meta-field"><span>Detection:</span> {data['Detection Layer'] || '-'}</Text>
-                    <Text className="meta-field"><span>Detection:</span> {data['Predicted Classes'] || '-'}</Text>
+                    <Text className="meta-field"><span>Prediction:</span> {data['Predicted Classes'] || '-'}</Text>
                     <div className="analysis-buttons">
                         <Button
                             type={localData.Analysis === 'Bug' ? 'primary' : 'default'}
@@ -125,7 +164,7 @@ const AnalysisCard = ({ data, onUpdate, expectedClasses, analysts, onPreview }) 
                                 </Select>
                             </div>
 
-                            <div className="form-field">
+                            {/* <div className="form-field">
                                 <label>Expected Score</label>
                                 <Input
                                     type="number"
@@ -134,16 +173,23 @@ const AnalysisCard = ({ data, onUpdate, expectedClasses, analysts, onPreview }) 
                                     placeholder="Enter Expected score"
                                     className="input-field"
                                 />
-                            </div>
+                            </div> */}
 
                             <div className="form-field">
                                 <label>Reproduced URLs</label>
-                                <TextArea
+                                {/* <TextArea
                                     value={localData.ReproducedUrls}
                                     onChange={(e) => handleChange('ReproducedUrls', e.target.value)}
                                     placeholder="Enter URLs (comma separated)"
                                     rows={2}
                                     className="input-field"
+                                /> */}
+                                <Select
+                                    mode="tags"
+                                    placeholder="Enter reproduced urls..."
+                                    className="dark-styled-select"
+                                    value={reproducedUrls}
+                                    onChange={handleReproducedUrlChange}
                                 />
                             </div>
 
@@ -161,6 +207,12 @@ const AnalysisCard = ({ data, onUpdate, expectedClasses, analysts, onPreview }) 
                                     ))}
                                 </Select>
                             </div>
+                            <Button
+                                onClick={validate}
+                                className='validation-btn'
+                            >
+                                Validate
+                            </Button>
                         </div>
                     )}
                 </div>

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState, version } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Select, Input, Button } from "antd";
 import { 
     CaretDownOutlined, 
@@ -18,6 +18,7 @@ const FreshLoadTest = () => {
     const [selectedModel, setSelectedModel] = useState(null);
     const [selectedVersion, setSelectedVersion] = useState(null);
     const [emails, setEmails] = useState([]);
+    const [threshold, setThreshold] = useState("0.5")
 
     useEffect(() => {
         const init = async () => {
@@ -83,7 +84,7 @@ const FreshLoadTest = () => {
                             ))}
                         </Select>
                     </div>
-    
+
                     {/* Versions Dropdown */}
                     <div className="dark-input-group">
                         <label className="dark-input-label">Select Version</label>
@@ -107,7 +108,7 @@ const FreshLoadTest = () => {
                                 ))}
                         </Select>
                     </div>
-    
+
                     {/* Gmail Input */}
                     <div className="dark-input-group">
                         <label className="dark-input-label">Email Addresses</label>
@@ -120,6 +121,20 @@ const FreshLoadTest = () => {
                         />
                         <div className="dark-input-hint">Press Enter to add multiple emails</div>
                     </div>
+
+                    {/* Set Threshold */}
+                    <div className="dark-input-group">
+                        <label className="dark-input-label">Set Threshold</label>
+                        <Input
+                            placeholder="Set Threshold"
+                            className="input-field dark-styled-select"
+                            value={threshold}
+                            onChange={(e) => {
+                                setThreshold(e.target.value)
+                            }}
+                        />
+                    </div>
+                    <div className="dark-input-hint">{"0 < threshold <= 1"}</div>
     
                     {/* Submit Button */}
                     <Button 
