@@ -8,7 +8,7 @@ import '../css/analysis-main.css';
 const { Title } = Typography;
 const { Option } = Select;
 
-const Analysis = () => {
+const Analysis = ({ analysts, expectedClasses }) => {
     const [data, setData] = useState([]);
     const [selectedModel, setSelectedModel] = useState('');
     const [loading, setLoading] = useState(false);
@@ -153,7 +153,7 @@ const Analysis = () => {
                                 key={index}
                                 data={item}
                                 onUpdate={(updatedItem) => handleDataUpdate(index, updatedItem)}
-                                expectedClasses={MODEL_CLASSES[selectedModel] || []}
+                                expectedClasses={expectedClasses || []}
                                 analysts={ANALYSTS}
                                 onPreview={showPreview}
                             />

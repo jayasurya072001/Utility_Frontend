@@ -10,6 +10,7 @@ import {
 import '../styles.css';
 import { fetchModels, startProcess } from "../util-api/api";
 import toast from 'react-hot-toast';
+import axios from "axios";
 
 const { Option } = Select;
 
@@ -19,6 +20,21 @@ const FreshLoadTest = () => {
     const [selectedVersion, setSelectedVersion] = useState(null);
     const [emails, setEmails] = useState([]);
     const [threshold, setThreshold] = useState("0.5")
+
+    useEffect(() => {
+        const init = async () => {
+            try {
+                const response = await axios.get("http://localhost:5000/utilities/analysis/get-threshold")
+                    .then(res => res.data)
+    
+                setThreshold(response?.threshold || "0.5")
+            } catch(err) {
+                console.error("Cannot Fetch Threshold", err)
+            }
+        }
+
+        init()
+    }, [axios, setThreshold])
 
     useEffect(() => {
         const init = async () => {

@@ -7,6 +7,7 @@ import "../styles.css";
 const Chunks = () => {
   const [chunks, setChunks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedModel, setSelectedModel] = useState()
 
   const navigate = useNavigate()
 
@@ -18,9 +19,16 @@ const Chunks = () => {
   };
 
   useEffect(() => {
+    axios.get("http://localhost:5000/utilities/analysis/get-selected-model")
+      .then((response) => {
+        setSelectedModel(response?.model)
+      })
+  }, [axios, setSelectedModel])
+
+  useEffect(() => {
     const fetchChunks = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/utilities/analysis/get_chunks"); // Replace with actual API URL
+        const response = await axios.get("http://localhost:5000/utilities/analysis/get-chunks"); // Replace with actual API URL
         setChunks(response.data);
       } catch (error) {
         console.error("Error fetching chunks:", error);
@@ -54,8 +62,9 @@ const Chunks = () => {
                 }}
                 onClick={() => handleClick(chunk.file)}
             >
-                <p style={{ color: "white" }}><strong>File:</strong> {chunk.file}</p>
-                <p style={{ color: "white" }}><strong>Status:</strong> {chunk.status}</p>
+                <p style={{ color: "white" }}><strong>File:</strong> {chunk?.file}</p>
+                <p style={{ color: "white" }}><strong>Analyst:</strong> {chunk?.analyst}</p>
+                <p style={{ color: "white" }}><strong>Status:</strong> {chunk?.status}</p>
             </Card>
             ))
         )}

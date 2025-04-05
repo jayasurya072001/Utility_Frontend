@@ -15,7 +15,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const fetchModels = async () => {
   try {
-    const response = await axios.get(`http://localhost:5000/utilities/dynamic-test/all_models`);
+    const response = await axios.get(`http://localhost:5000/utilities/dynamic-test/all-models`);
     console.log(response.data);
 
     return response.data
@@ -29,7 +29,7 @@ export const startProcess = async (version, model, recipients) => {
 
   const data = { version, model, recipients }
   try {
-    const response = await axios.post(`http://localhost:5000/utilities/dynamic-test/start_process`, data)
+    const response = await axios.post(`http://localhost:5000/utilities/dynamic-test/start-process`, data)
 
     return response
   } catch (error) {

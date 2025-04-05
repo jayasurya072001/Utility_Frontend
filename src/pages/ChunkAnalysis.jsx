@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Upload, Button, Select, Typography, message, Modal } from 'antd';
 import { UploadOutlined, DownloadOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import Papa from 'papaparse';
@@ -13,6 +13,7 @@ const { Option } = Select;
 const ChunkAnalysis = () => {
     const [data, setData] = useState([]);
     const [selectedModel, setSelectedModel] = useState('');
+    const [expectedClasses, setExpectedClasses] = useState([])
     const [loading, setLoading] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
     const [isPreviewVisible, setIsPreviewVisible] = useState(false);
@@ -21,6 +22,15 @@ const ChunkAnalysis = () => {
     const [threshold, setThreshold] = useState("0.5");
 
     const { chunk } = useParams()    // Mock data - replace with API calls
+
+    useEffect(() => {
+      if(selectedModel){
+        axios.get(`http://localhost:5000/utilities/analysis/get-model-classes/${selectedModel}`)
+          .then((response) => {
+            setExpectedClasses(response.data)
+          })
+      }
+    }, [setExpectedClasses, axios, selectedModel])
 
     useEffect(() => {
       const fetchThreshold = async () => {
@@ -36,35 +46,42 @@ const ChunkAnalysis = () => {
     }, [setThreshold, axios])
   
 
-    useEffect(() => {
+    const fetchChunks = useCallback(() => {
         if (!chunk) return; // Avoid making requests if chunk is undefined/null
     
         console.log("Fetching chunk:", chunk);
     
-        axios.get(`http://localhost:5000/utilities/analysis/get_chunk/${chunk}`)
+        axios.get(`http://localhost:5000/utilities/analysis/get-chunk/${chunk}`)
             .then(response => {
-                console.log("Response:", response.data);
+                // console.log("Response:", response.data);
                 setData(response.data.data); // Update data state
                 setSelectedModel(response.data.model); // Update model state
+
+                console.log("Chunk Data", response.data.data)
             })
             .catch(error => {
                 console.error("Error fetching chunk:", error);
             });
-    
     }, [axios, chunk, setData, setSelectedModel])
 
     useEffect(() => {
-        axios.get(`http://localhost:5000/utilities/analysis/get-model-classes/${selectedModel.toLowerCase()}`)
-            .then(response => {
-                console.log("Response:", response.data)
-                setModelClasses(response.data)
-            })
+        fetchChunks()
+    }, [fetchChunks])
+
+    useEffect(() => {
+        if(selectedModel){
+            axios.get(`http://localhost:5000/utilities/analysis/get-model-classes/${selectedModel.toLowerCase()}`)
+                .then(response => {
+                    // console.log("Response:", response.data)
+                    setModelClasses(response.data)
+                })
+        }
     }, [setModelClasses, axios, selectedModel])
 
     useEffect(() => {
         axios.get(`http://localhost:5000/utilities/analysis/get-all-analysts`)
             .then(response => {
-                console.log(response.data)
+                // console.log(response.data)
                 setAnalysts(response.data)
             })
     }, [axios, setAnalysts])
@@ -140,9 +157,11 @@ const ChunkAnalysis = () => {
                                 key={index}
                                 data={{ ...item, threshold }}
                                 onUpdate={(updatedItem) => handleDataUpdate(index, updatedItem)}
-                                expectedClasses={modelClasses || []}
+                                expectedClasses={expectedClasses}
                                 analysts={analysts}
                                 onPreview={showPreview}
+                                chunk={chunk}
+                                fetchChunks={fetchChunks}
                             />
                         ))}
                     </div>

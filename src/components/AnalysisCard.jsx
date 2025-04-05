@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Card, Button, Select, Input, Typography, message } from 'antd';
+import { Card, Button, Select, Input, Typography, message, Tag } from 'antd';
 import { ExpandOutlined, LinkOutlined } from '@ant-design/icons';
 import '../css/analysis-card.css'
 import axios from 'axios';
@@ -8,10 +8,18 @@ const { Text } = Typography;
 const { Option } = Select;
 const { TextArea } = Input;
 
-const AnalysisCard = ({ data, onUpdate, expectedClasses, analysts, onPreview }) => {
+const AnalysisCard = ({ data, onUpdate, expectedClasses, analysts, onPreview, chunk, fetchChunks }) => {
     const [localData, setLocalData] = useState(data);
     const [predictionClasses, setPredictionClasses] = useState(null)
     const [reproducedUrls, setReproducedUrls] = useState([])
+    const [selectedExpectedClasses, setSelectedExpectedClasses] = useState([])
+    const [expectedClassesOptions, setExpectedClassesOptions] = useState([])
+
+    useEffect(() => {
+        if(Array.isArray(expectedClasses)) {
+            setExpectedClassesOptions(expectedClasses?.map(each => ({ label: each, value: each })))
+        }
+    }, [expectedClasses, setExpectedClassesOptions])
 
     useEffect(() => {
         try{
@@ -78,18 +86,54 @@ const AnalysisCard = ({ data, onUpdate, expectedClasses, analysts, onPreview }) 
     };
 
     const validate = useCallback(async () => {
-        response = await axios.post("http://localhost:5000/utilities/analysis/proof-validation", {
+        const response = await axios.post("http://localhost:5000/utilities/analysis/proof-validation", {
             "imageURL": data["inputMediaUrl"],
-            "expectedClasses": [],
-            "reproducedUrls": []
-        })
+            "expectedClasses": selectedExpectedClasses,
+            "reproducedUrls": reproducedUrls,
+            "chunk": chunk
+        },
+        {
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }).then(res => res.data)
 
         console.log("Validation Response", response)
-    }, [data, reproducedUrls])
+    }, [data, reproducedUrls, selectedExpectedClasses])
+
+    const handleValidateClick = useCallback(() => {
+        validate()
+    }, [validate])
 
     const handleReproducedUrlChange = useCallback((e) => {
         setReproducedUrls(e)
     }, [setReproducedUrls])
+
+    const setNotBug = useCallback(() => {
+        const init = async () => {
+            const response = await axios.post("http://localhost:5000/utilities/analysis/set-notbug", {
+                "chunk": chunk,
+                "inputMediaUrl": data["inputMediaUrl"]
+            })
+
+            fetchChunks()
+        }
+
+        init()
+    }, [axios, data, chunk, fetchChunks])
+
+    const setOutlier = useCallback(() => {
+        const init = async () => {
+            const response = await axios.post("http://localhost:5000/utilities/analysis/set-outlier", {
+                "chunk": chunk,
+                "inputMediaUrl": data["inputMediaUrl"]
+            })
+
+            fetchChunks()
+        }
+
+        init()
+    }, [axios, data, chunk, fetchChunks])
 
     return (
         <Card className="analysis-card">
@@ -132,14 +176,20 @@ const AnalysisCard = ({ data, onUpdate, expectedClasses, analysts, onPreview }) 
                         </Button>
                         <Button
                             type={localData.Analysis === 'Not Bug' ? 'primary' : 'default'}
-                            onClick={() => toggleAnalysis('Not Bug')}
+                            onClick={() => {
+                                toggleAnalysis('Not Bug')
+                                setNotBug()
+                            }}
                             className="analysis-btn"
                         >
                             Not Bug
                         </Button>
                         <Button
                             type={localData.Analysis === 'Outlier' ? 'primary' : 'default'}
-                            onClick={() => toggleAnalysis('Outlier')}
+                            onClick={() => {
+                                toggleAnalysis('Outlier')
+                                setOutlier()
+                            }}
                             className="analysis-btn"
                         >
                             Outlier
@@ -152,16 +202,17 @@ const AnalysisCard = ({ data, onUpdate, expectedClasses, analysts, onPreview }) 
                                 <label>Expected Classes</label>
                                 <Select
                                     mode="multiple"
-                                    value={localData.ExpectedClasses}
-                                    onChange={(val) => handleChange('ExpectedClasses', val)}
+                                    options={expectedClassesOptions}
+                                    value={selectedExpectedClasses}
+                                    onChange={
+                                        (val) => {
+                                            handleChange('ExpectedClasses', val)
+                                            setSelectedExpectedClasses(val)
+                                        }}
                                     placeholder="Select Expected classes"
                                     className="input-field"
                                     style={{ width: '100%' }}
-                                >
-                                    {expectedClasses.map(cls => (
-                                        <Option key={cls} value={cls}>{cls}</Option>
-                                    ))}
-                                </Select>
+                                />
                             </div>
 
                             {/* <div className="form-field">
@@ -187,9 +238,12 @@ const AnalysisCard = ({ data, onUpdate, expectedClasses, analysts, onPreview }) 
                                 <Select
                                     mode="tags"
                                     placeholder="Enter reproduced urls..."
-                                    className="dark-styled-select"
+                                    className="dark-styled-select input-field"
                                     value={reproducedUrls}
                                     onChange={handleReproducedUrlChange}
+                                    style={{ width: '100%' }}
+                                    maxTagTextLength={25} /* Hard truncate at 25 chars (optional) */
+
                                 />
                             </div>
 
@@ -208,7 +262,7 @@ const AnalysisCard = ({ data, onUpdate, expectedClasses, analysts, onPreview }) 
                                 </Select>
                             </div>
                             <Button
-                                onClick={validate}
+                                onClick={handleValidateClick}
                                 className='validation-btn'
                             >
                                 Validate
