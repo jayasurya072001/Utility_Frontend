@@ -1,13 +1,16 @@
-import { useEffect, useState } from "react";
-import { Card, Spin } from "antd";
+import { useCallback, useEffect, useState } from "react";
+import { Card, Spin, Button } from "antd";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { UploadOutlined, DownloadOutlined, CloseCircleOutlined, MergeCellsOutlined, ShrinkOutlined } from '@ant-design/icons';
 import "../styles.css";
+import toast from "react-hot-toast";
 
 const Chunks = () => {
   const [chunks, setChunks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedModel, setSelectedModel] = useState()
+  const [canMerge, setCanMerge] = useState(false)
 
   const navigate = useNavigate()
 
@@ -17,6 +20,29 @@ const Chunks = () => {
 
     navigate(`/analysis/${file}`)
   };
+
+  const handleMerge = useCallback(() => {
+    const init = async () => {
+      const response = await axios.get("http://localhost:5000/utilities/analysis/merge")
+
+      console.log(response.data)
+
+      if(response?.data?.message && response?.data?.message === "merge successful"){
+        toast.success(response.data.message)
+
+      } else {
+        toast.error(response?.data?.error || "Cannot Merge")
+      }
+
+      setTimeout(() => {
+        window.location.reload()
+      }, [2000])
+    }
+
+    if(canMerge){
+      init()
+    }
+  }, [canMerge, axios])
 
   useEffect(() => {
     axios.get("http://localhost:5000/utilities/analysis/get-selected-model")
@@ -39,6 +65,22 @@ const Chunks = () => {
 
     fetchChunks();
   }, [axios, setLoading, setChunks]);
+
+  useEffect(() => {
+    const init = async () => {
+      const response = await axios.get("http://localhost:5000/utilities/analysis/can-merge")
+
+      if(response?.data){
+        setCanMerge(response.data["can-merge"])
+      }
+    }
+
+    init()
+  }, [setCanMerge, axios])
+
+  useEffect(() => {
+    console.log("can-merge", canMerge)
+  }, [canMerge])
 
   return (
     <div className="dark-app-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}>
@@ -68,6 +110,17 @@ const Chunks = () => {
             </Card>
             ))
         )}
+      </div>
+      <div style={{ textAlign: 'center', margin: '20px 0' }}>
+          <Button
+              type="primary"
+              disabled={!canMerge}
+              icon={<ShrinkOutlined />}
+              onClick={handleMerge}
+              className="export-btn"
+          >
+              Merge Chunks
+          </Button>
       </div>
     </div>
   );

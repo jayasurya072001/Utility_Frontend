@@ -43,7 +43,15 @@ const AnalysisCard = ({ data, onUpdate, expectedClasses, analysts, onPreview, ch
         }
     }, [data, setPredictionClasses])
 
-    const handleChange = (field, value) => {
+    const handleChange = async (field, value, type) => {
+        if(!type){
+            console.log("Unsetting")
+            const response = await axios.post("http://localhost:5000/utilities/analysis/unset-analysis", {
+                "chunk": chunk,
+                "inputMediaUrl": localData['inputMediaUrl']
+            })
+            console.log("Unset Analysis:", response)
+        }
         const updated = { ...localData, [field]: value };
         setLocalData(updated);
         onUpdate(updated);
@@ -51,7 +59,7 @@ const AnalysisCard = ({ data, onUpdate, expectedClasses, analysts, onPreview, ch
 
     const toggleAnalysis = (type) => {
         const newType = localData.Analysis === type ? '' : type;
-        handleChange('Analysis', newType);
+        handleChange('Analysis', newType, type);
     };
 
     const copyImageUrl = () => {
@@ -98,6 +106,9 @@ const AnalysisCard = ({ data, onUpdate, expectedClasses, analysts, onPreview, ch
             }
         }).then(res => res.data)
 
+        if(response?.invalid_urls && response?.invalid_urls?.length === 0){
+            setLocalData(prev => ({ ...prev, "Analysis": "Bug", "Validation": true }))
+        }
         console.log("Validation Response", response)
     }, [data, reproducedUrls, selectedExpectedClasses])
 
@@ -196,7 +207,7 @@ const AnalysisCard = ({ data, onUpdate, expectedClasses, analysts, onPreview, ch
                         </Button>
                     </div>
 
-                    {localData.Analysis === 'Bug' && (
+                    {localData.Analysis === 'Bug' && localData?.Validation && (
                         <div className="bug-fields">
                             <div className="form-field">
                                 <label>Expected Classes</label>
@@ -247,7 +258,7 @@ const AnalysisCard = ({ data, onUpdate, expectedClasses, analysts, onPreview, ch
                                 />
                             </div>
 
-                            <div className="form-field">
+                            {/* <div className="form-field">
                                 <label>Analysed By</label>
                                 <Select
                                     value={localData.AnalysedBy}
@@ -260,7 +271,7 @@ const AnalysisCard = ({ data, onUpdate, expectedClasses, analysts, onPreview, ch
                                         <Option key={analyst} value={analyst}>{analyst}</Option>
                                     ))}
                                 </Select>
-                            </div>
+                            </div> */}
                             <Button
                                 onClick={handleValidateClick}
                                 className='validation-btn'

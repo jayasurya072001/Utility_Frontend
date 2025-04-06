@@ -53,7 +53,7 @@ const ChunkAnalysis = () => {
     
         axios.get(`http://localhost:5000/utilities/analysis/get-chunk/${chunk}`)
             .then(response => {
-                // console.log("Response:", response.data);
+                console.log("Response:", response.data.data);
                 setData(response.data.data); // Update data state
                 setSelectedModel(response.data.model); // Update model state
 
