@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, version } from "react";
 import { Select, Upload, Button, Card, message, Divider, Row, Col } from "antd";
 import { InboxOutlined, CloudUploadOutlined } from "@ant-design/icons";
 import axios, { all } from "axios";
@@ -62,7 +62,7 @@ const RegressionLoadTest = () => {
     // }, 2000);
 
     try {
-      const response = await initiateRegressionTest({})
+      const response = await initiateRegressionTest({model: selectedModel, version: selectedVersion})
       console.log('Request successful:', response);
       toast.success(response?.message)
       return response; // or whatever you want to return
@@ -159,7 +159,6 @@ const RegressionLoadTest = () => {
           borderRadius: "8px",
           boxShadow: "0 4px 12px #111",
           borderBottom: "1px solid #333",
-          background: "#1a1a1a",
           padding: "24px",
           width: "600px"
         }}

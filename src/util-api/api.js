@@ -116,6 +116,11 @@ export const getThreshold = async () => {
     .then(response => response.data)
 }
 
+export const getExpectedScore = async () => {
+  return await axios.get("http://localhost:5000/utilities/dynamic-test/get-expected-score")
+  .then(response => response.data)
+}
+
 export const getChunkData = async (chunk) => {
   return await axios.get(`http://localhost:5000/utilities/analysis/get-chunk/${chunk}`)
     .then(response => response.data)

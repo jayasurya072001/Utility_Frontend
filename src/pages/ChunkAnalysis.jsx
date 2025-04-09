@@ -6,7 +6,7 @@ import AnalysisCard from '../components/AnalysisCard';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import '../css/analysis-main.css';
-import { getAllAnalysts, getChunkData, getExpectedClasses, getModelClasses, getThreshold } from '../util-api/api';
+import { getAllAnalysts, getChunkData, getExpectedClasses, getModelClasses, getExpectedScore } from '../util-api/api';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -20,9 +20,21 @@ const ChunkAnalysis = () => {
     const [isPreviewVisible, setIsPreviewVisible] = useState(false);
     const [modelClasses, setModelClasses] = useState([])
     const [analysts, setAnalysts] = useState([])
-    const [threshold, setThreshold] = useState("0.5");
+    const [expectedScore, setExpectedScore] = useState("0.5");
 
     const { chunk } = useParams()    // Mock data - replace with API calls
+
+    useEffect(() => {
+        const init = async () => {
+            const response = await getExpectedScore()
+
+            if(response["expected-score"]){
+                setExpectedScore(response["expected-score"])
+            }
+        }
+
+        init()
+    }, [setExpectedScore])
 
     useEffect(() => {
       const init = async () => {
@@ -35,19 +47,6 @@ const ChunkAnalysis = () => {
         init()
       }
     }, [setExpectedClasses, axios, selectedModel])
-
-    useEffect(() => {
-      const fetchThreshold = async () => {
-        try {
-          const response = await getThreshold()
-          setThreshold(response?.threshold || 0.5)
-        } catch(e) {
-          console.error(e)
-        }
-      }
-  
-      fetchThreshold()
-    }, [setThreshold, axios])
   
 
     const fetchChunks = useCallback(() => {
@@ -148,72 +147,32 @@ const ChunkAnalysis = () => {
     };
 
     return (
-        <div className="analysis-container">
+        <div className="analysis-container" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div className="header-controls">
                 {selectedModel}
             </div>
-
+    
             {data.length > 0 && (
-                <>
-
-                    <div className="cards-grid">
-                        {data.map((item, index) => (
+                <div className="cards-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '16px' }}>
+                    {data.map((item, index) => (
+                        <div key={index} style={{ /* Optional styling for individual card container */ }}>
                             <AnalysisCard
                                 key={index}
-                                data={{ ...item, threshold }}
+                                data={{ ...item, expectedScore }}
                                 onUpdate={(updatedItem) => handleDataUpdate(index, updatedItem)}
                                 expectedClasses={expectedClasses}
                                 analysts={analysts}
                                 onPreview={showPreview}
                                 chunk={chunk}
                                 fetchChunks={fetchChunks}
+                                expectedScore={expectedScore}
+                                // You might need to adjust styling within AnalysisCard as well
+                                style={{ /* Optional styling to override AnalysisCard's default */ }}
                             />
-                        ))}
-                    </div>
-                    {/* <div style={{ textAlign: 'center', margin: '20px 0' }}>
-                        <Button
-                            type="primary"
-                            icon={<DownloadOutlined />}
-                            onClick={exportToCSV}
-                            className="export-btn"
-                        >
-                            Export Results
-                        </Button>
-                    </div> */}
-                </>
+                        </div>
+                    ))}
+                </div>
             )}
-
-            {/* <Modal
-                visible={isPreviewVisible}
-                footer={null}
-                onCancel={() => setIsPreviewVisible(false)}
-                centered
-                width="auto"
-                style={{
-                    padding: 0,
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    backgroundColor: '#1a1a1a'
-                }}
-                closeIcon={<CloseCircleOutlined style={{ 
-                    color: 'white',
-                    fontSize: '24px',
-                    background: '#111',
-                    borderRadius: '50%',
-                    padding: '4px'
-                  }} />}
-            >
-                <img
-                    src={previewImage}
-                    alt="Fullscreen preview"
-                    style={{
-                        maxWidth: '90vw',
-                        maxHeight: '90vh',
-                        objectFit: 'contain'
-                    }}
-                />
-            </Modal> */}
         </div>
     );
 };

@@ -1,22 +1,24 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Card, Button, Select, Input, Typography, message, Tag } from 'antd';
+import { Card, Button, Select, Input, Typography, message, Tag, Spin } from 'antd';
 import { ExpandOutlined, LinkOutlined } from '@ant-design/icons';
 import '../css/analysis-card.css'
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { analysisCardHandleChange, proofValidation, setNotBug, setOutlier } from '../util-api/api';
+import { parse } from 'papaparse';
 
 const { Text } = Typography;
 const { Option } = Select;
 const { TextArea } = Input;
 
-const AnalysisCard = ({ data, onUpdate, expectedClasses, analysts, onPreview, chunk, fetchChunks }) => {
+const AnalysisCard = ({ data, onUpdate, expectedClasses, analysts, onPreview, chunk, fetchChunks, expectedScore }) => {
     const [localData, setLocalData] = useState(data);
     const [predictionClasses, setPredictionClasses] = useState(null)
     const [reproducedUrls, setReproducedUrls] = useState([])
     const [selectedExpectedClasses, setSelectedExpectedClasses] = useState([])
     const [expectedClassesOptions, setExpectedClassesOptions] = useState([])
     const [validationLoading, setValidationLoading] = useState(false)
+    const [parsedPredictedClasses, setParsedPredictedClasses] = useState({})
 
     useEffect(() => {
         if(Array.isArray(expectedClasses)) {
@@ -94,6 +96,7 @@ const AnalysisCard = ({ data, onUpdate, expectedClasses, analysts, onPreview, ch
     };
 
     const validate = useCallback(async () => {
+        setValidationLoading(true)
         const d = {
             "inputMediaUrl": data["inputMediaUrl"],
             "expectedClasses": selectedExpectedClasses,
@@ -106,14 +109,15 @@ const AnalysisCard = ({ data, onUpdate, expectedClasses, analysts, onPreview, ch
 
         if(response?.invalid_urls && response?.invalid_urls?.length === 0){
             setLocalData(prev => ({ ...prev, "Analysis": "Bug", "Validation": true }))
-            toast.success("Validated")
+            toast.success(`Validated ${data["inputMediaUrl"]}`)
         } else {
-            toast.error("Cannot Validate")
+            toast.error(`Cannot Validate ${data["inputMediaUrl"]}`)
         }
         console.log("Validation Response", response)
         console.log("IU", response?.invalid_urls)
         console.log("IUL", response?.invalid_urls?.length)
-    }, [data, reproducedUrls, selectedExpectedClasses])
+        setValidationLoading(false)
+    }, [data, reproducedUrls, selectedExpectedClasses, setValidationLoading])
 
     const handleValidateClick = useCallback(() => {
         validate()
@@ -142,6 +146,18 @@ const AnalysisCard = ({ data, onUpdate, expectedClasses, analysts, onPreview, ch
 
         init()
     }, [data, chunk, fetchChunks])
+
+    useEffect(() => {
+      try {
+        const jsonString = data['Predicted Classes'].replace(/'/g, '"'); // Replace single quotes with double quotes
+        const parsedData = JSON.parse(jsonString);
+        setParsedPredictedClasses(parsedData)
+      } catch (error) {
+        console.error('Error parsing Predicted Classes:', error);
+        setParsedPredictedClasses({})
+      }
+    }, [data, setParsedPredictedClasses]);
+    
 
     return (
         <Card className="analysis-card">
@@ -173,7 +189,18 @@ const AnalysisCard = ({ data, onUpdate, expectedClasses, analysts, onPreview, ch
               <Text className="meta-field"><span>Result:</span> {data["Result"] || '-'}</Text>
               <Text className="meta-field"><span>Projection:</span> {data['Projection Layer'] || '-'}</Text>
               <Text className="meta-field"><span>Detection:</span> {data['Detection Layer'] || '-'}</Text>
-              <Text className="meta-field"><span>Prediction:</span> {data['Predicted Classes'] || '-'}</Text>
+              <Text className="meta-field">
+              <span>Prediction:</span>
+              {Object.keys(parsedPredictedClasses).length > 0 ? (
+                Object.entries(parsedPredictedClasses).map(([key, value]) => (
+                  <span key={key} style={{ color: Number(value) >= Number(expectedScore) ? '#32CD32' : '#FF3737' }}>
+                    {key}: {value.toFixed(4)}<br />
+                  </span>
+                ))
+              ) : (
+                '-'
+              )}
+            </Text>
               <div className="analysis-buttons">
                 <Button
                   type={localData.Analysis === 'Bug' ? 'primary' : 'default'}
@@ -235,13 +262,18 @@ const AnalysisCard = ({ data, onUpdate, expectedClasses, analysts, onPreview, ch
                     />
                   </div>
       
-                  <Button
-                    onClick={handleValidateClick}
-                    className='validation-btn'
-                    disabled={validationLoading}
-                  >
-                    Validate
-                  </Button>
+                  {validationLoading ? 
+                    <>
+                      <Spin />
+                    </> : 
+                    <Button
+                      onClick={handleValidateClick}
+                      className='validation-btn'
+                      disabled={validationLoading}
+                    >
+                      Validate
+                    </Button>
+                  }
                 </div>
               )}
             </div>
