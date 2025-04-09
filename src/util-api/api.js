@@ -56,3 +56,125 @@ export const runUrlModelTest = async (model, version, imageUrl) => {
   }
 };
 
+export const runFileModelTest = async (model, version, file) => {
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("model", model);
+    formData.append("version", version);
+ 
+    const response = await axios.post(`${API_BASE_URL}/utility/file-upload`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+ 
+    return response.data.predictions;
+  } catch (error) {
+    console.error("Error running File Model Test:", error);
+    return { error: "Failed to process request" };
+  }
+};
+
+export const analysisCardHandleChange = async (chunk, inputMediaUrl) => {
+  return await axios.post("http://localhost:5000/utilities/analysis/unset-analysis", {
+    "chunk": chunk,
+    "inputMediaUrl": localData['inputMediaUrl']
+})
+}
+
+export const proofValidation = async (data) => {
+  return await axios.post("http://localhost:5000/utilities/analysis/proof-validation", data,
+    {
+        headers: {
+            "Content-Type": "application/json"
+        }
+    }).then(res => res.data)
+}
+
+export const setNotBug = async (chunk, inputMediaUrl) => {
+  return await axios.post("http://localhost:5000/utilities/analysis/set-notbug", {
+      "chunk": chunk,
+      "inputMediaUrl": inputMediaUrl
+  })
+}
+
+export const setOutlier = async (chunk, inputMediaUrl) => {
+  return await axios.post("http://localhost:5000/utilities/analysis/set-outlier", {
+      "chunk": chunk,
+      "inputMediaUrl": inputMediaUrl
+  })
+}
+
+export const getExpectedClasses = async (model) => {
+  return await axios.get(`http://localhost:5000/utilities/analysis/get-model-classes/${model}`)
+    .then(response => response.data)
+}
+
+export const getThreshold = async () => {
+  return await axios.get("http://localhost:5000/utilities/analysis/get-threshold")
+    .then(response => response.data)
+}
+
+export const getChunkData = async (chunk) => {
+  return await axios.get(`http://localhost:5000/utilities/analysis/get-chunk/${chunk}`)
+    .then(response => response.data)
+    .catch(error => {
+      console.error("Error fetching chunk:", error)
+    })
+}
+
+export const getChunks = async () => {
+  return await axios.get("http://localhost:5000/utilities/analysis/get-chunks")
+    .then(response => response.data)
+}
+
+export const getModelClasses = async (model) => {
+  return await axios.get(`http://localhost:5000/utilities/analysis/get-model-classes/${model.toLowerCase()}`)
+    .then(response => response.data)
+}
+
+export const getAllAnalysts = async () => {
+  return await axios.get(`http://localhost:5000/utilities/analysis/get-all-analysts`)
+    .then(response => response.data)
+}
+
+export const canMerge = async () => {
+  return await axios.get("http://localhost:5000/utilities/analysis/can-merge")
+    .then(response => response.data)
+}
+
+export const initiateMerge = async () => {
+  return await axios.get("http://localhost:5000/utilities/analysis/merge")
+    .then(response => response.data)
+}
+
+export const getSelectedModel = async () => {
+  return await axios.get("http://localhost:5000/utilities/analysis/get-selected-model")
+    .then(response => response.data)
+}
+
+export const getAllVersions = async (model) => {
+  return await axios.get(`http://localhost:5000/utilities/dynamic-test/all-versions/${model}`)
+    .then(response => response.data)
+}
+
+export const getRegressionReady = async () => {
+  return await axios.get("http://localhost:5000/utilities/regression-test/get-regression-ready")
+    .then(response => response.data)
+}
+
+export const initiateRegressionTest = async (data = {}) => {
+  return await axios.post('http://localhost:5000/utilities/regression-test/run', data)
+    .then(response => response.data)
+}
+
+export const getSelectedVersion = async () => {
+  return axios.get(`http://localhost:5000/utilities/dynamic-test/get-selected-version`)
+    .then(res => res.data)
+}
+
+export const getRegressionModel = async () => {
+  return await axios.get("http://localhost:5000/utilities/regression-test/get-regression-model")
+    .then(response => response.data)
+}

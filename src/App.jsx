@@ -16,6 +16,7 @@ import SignupPage from "./pages/SignUpPage.jsx";
 import AdminLoginPage from "./pages/AdminLoginPage.jsx";
 import Chunks from "./pages/Chunks.jsx";
 import ChunkAnalysis from "./pages/ChunkAnalysis.jsx";
+import InputMediaTest from "./pages/InputMediaTest.jsx";
 
 const { Content } = Layout;
 
@@ -103,8 +104,7 @@ const App = () => {
             <Route path="/analysis" element={<Chunks />} />
             <Route path="/analysis/:chunk" element={<ChunkAnalysis />} />
             <Route path="/regression-load" element={<RegressionLoadTest />} />
-            <Route path="/urlmodel-test" element={<UrlModelTest />} />
-            <Route path="/file-upload" element={<FileModelTest />} />
+            <Route path="/media-test" element={<InputMediaTest />} />
             <Route path="/" element={<HomePage />} />
           </Routes>
         </Content>

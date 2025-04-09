@@ -1,81 +1,36 @@
-/* Dropdown Container */
-.ant-select-dropdown {
-    background-color: #2a2a2a !important;
-    border: 1px solid #444 !important;
-    border-radius: 6px !important;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3) !important;
-}
+/* Global Styles */
 
-/* Dropdown Options */
-.ant-select-item {
-    color: #e0e0e0 !important;
-    font-size: 14px !important;
-    padding: 10px 16px !important;
-}
-
-/* Hovered Option */
-.ant-select-item-option:hover {
-    background-color: #333 !important;
-}
-
-/* Selected Option */
-.ant-select-item-option-selected {
-    /* background-color: #1890ff !important; */
-    color: white !important;
-}
-
-/* Active (Clicked) Option */
-/* .ant-select-item-option-active {
-    background-color: #444 !important;
-} */
-
-/* Multi-Select Tags */
-.ant-select-selection-item {
-    /* background-color: #1890ff !important; */
-    color: white !important;
-    border-radius: 4px !important;
-    padding: 0 8px !important;
-}
-
-/* Placeholder Text */
-.ant-select-selection-placeholder {
-    color: #888 !important;
-    opacity: 1 !important;
-}
-
-/* Input Field */
-.ant-select-selector {
-    background-color: #1a1a1a !important;
-    border-color: #444 !important;
-    color: #e0e0e0 !important;
-    min-height: 32px !important;
-    padding: 1px 11px !important;
-}
-
-/* Dropdown Arrow */
-.ant-select-arrow {
-    color: #888 !important;
-}
-
-/* For Multi-Select Dropdown */
-.ant-select-multiple .ant-select-selection-item-remove {
-    color: white !important;
-}
-
-/* Clear Button */
-.ant-select-clear {
-    background: #2a2a2a !important;
-    color: #888 !important;
-}
-
-/* Dropdown Search Input */
-.ant-select-dropdown .ant-select-dropdown-search input {
-    background-color: #1a1a1a !important;
-    color: #e0e0e0 !important;
-    border-color: #444 !important;
-}
-
-.action-btn {
+.analysis-card {
+    background-color: #1a1a1a;
+    padding: 16px;
+    border-radius: 6px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+  }
+  
+  .card-content {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .image-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .image-section img {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 10px;
+  }
+  
+  .image-actions {
+    display: flex;
+    gap: 8px;
+  }
+  
+  .action-btn {
     width: 32px;
     height: 32px;
     background: rgba(0, 0, 0, 0.7) !important;
@@ -85,69 +40,130 @@
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-/* .action-btn:hover {
-    background: rgba(0, 0, 0, 0.9) !important;
-  } */
-
-.ant-select-item-option-selected {
-    background-color: #272829 !important;
-    color: white !important;
-}
-
-.ant-select-item-option-selected:hover {
-    background-color: #272829 !important;
-}
-
-@keyframes fadeInOut {
-    0% {
-        opacity: 0;
-        transform: translateX(-50%) translateY(20px);
-    }
-
-    20% {
-        opacity: 1;
-        transform: translateX(-50%) translateY(0);
-    }
-
-    80% {
-        opacity: 1;
-        transform: translateX(-50%) translateY(0);
-    }
-
-    100% {
-        opacity: 0;
-        transform: translateX(-50%) translateY(20px);
-    }
-}
-
-@keyframes fadeOut {
-    to {
-        opacity: 0;
-    }
-}
-
-.form-field {
+  }
+  
+  /* Data Section */
+  
+  .data-section {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .meta-field {
     margin-bottom: 10px;
-}
-
-.form-field label {
+  }
+  
+  .meta-field span {
+    font-weight: bold;
+  }
+  
+  .analysis-buttons {
+    margin-bottom: 20px;
+  }
+  
+  .analysis-btn {
+    margin-right: 10px;
+  }
+  
+  /* Bug Fields */
+  
+  .bug-fields {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .form-field {
+    margin-bottom: 20px;
+  }
+  
+  .form-field label {
     display: block;
     margin-bottom: 8px;
     color: #f1eded;
     font-size: 14px;
-}
-
-.input-field::placeholder,
-.input-field textarea::placeholder,
-.input-field input::placeholder {
+  }
+  
+  .input-field {
+    background-color: #1a1a1a;
+    border-color: #444;
+    color: #e0e0e0;
+    min-height: 32px;
+    padding: 1px 11px;
+  }
+  
+  .expected-classes-select,
+  .reproduced-urls-select {
+    max-width: 100%;
+    overflow: hidden;
+  }
+  
+  /* Ant Design Specific Styles */
+  
+  .ant-select-dropdown {
+    background-color: #2a2a2a !important;
+    border: 1px solid #444 !important;
+    border-radius: 6px !important;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3) !important;
+  }
+  
+  .ant-select-item {
+    color: #e0e0e0 !important;
+    font-size: 14px !important;
+    padding: 10px 16px !important;
+  }
+  
+  .ant-select-item-option:hover {
+    background-color: #333 !important;
+  }
+  
+  .ant-select-item-option-selected {
+    background-color: #272829 !important;
+    color: white !important;
+  }
+  
+  .ant-select-item-option-selected:hover {
+    background-color: #272829 !important;
+  }
+  
+  .ant-select-selection-item {
+    color: white !important;
+    border-radius: 4px !important;
+    padding: 0 8px !important;
+    max-width: 150px; /* Adjust as needed */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .ant-select-selection-placeholder {
     color: rgba(255, 255, 255, 0.6) !important;
-    /* Softer white */
     opacity: 1 !important;
-}
-
-/* Ant Design specific placeholder styling */
-.ant-select-selection-placeholder {
-    color: rgba(255, 255, 255, 0.6) !important;
-}
+  }
+  
+  .ant-select-selector {
+    background-color: #1a1a1a !important;
+    border-color: #444 !important;
+    color: #e0e0e0 !important;
+    min-height: 32px !important;
+    padding: 1px 11px !important;
+  }
+  
+  .ant-select-arrow {
+    color: #888 !important;
+  }
+  
+  .ant-select-multiple .ant-select-selection-item-remove {
+    color: white !important;
+  }
+  
+  .ant-select-clear {
+    background: #2a2a2a !important;
+    color: #888 !important;
+  }
+  
+  .ant-select-dropdown .ant-select-dropdown-search input {
+    background-color: #1a1a1a !important;
+    color: #e0e0e0 !important;
+    border-color: #444 !important;
+  }
+  

@@ -6,6 +6,7 @@ import AnalysisCard from '../components/AnalysisCard';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import '../css/analysis-main.css';
+import { getAllAnalysts, getChunkData, getExpectedClasses, getModelClasses, getThreshold } from '../util-api/api';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -24,19 +25,22 @@ const ChunkAnalysis = () => {
     const { chunk } = useParams()    // Mock data - replace with API calls
 
     useEffect(() => {
+      const init = async () => {
+        const response = await getExpectedClasses(selectedModel)
+
+        setExpectedClasses(response)
+      }
+
       if(selectedModel){
-        axios.get(`http://localhost:5000/utilities/analysis/get-model-classes/${selectedModel}`)
-          .then((response) => {
-            setExpectedClasses(response.data)
-          })
+        init()
       }
     }, [setExpectedClasses, axios, selectedModel])
 
     useEffect(() => {
       const fetchThreshold = async () => {
         try {
-          const respones = await axios.get("http://localhost:5000/utilities/analysis/get-threshold");
-          setThreshold(respones.data?.threshold || 0.5)
+          const response = await getThreshold()
+          setThreshold(response?.threshold || 0.5)
         } catch(e) {
           console.error(e)
         }
@@ -50,40 +54,41 @@ const ChunkAnalysis = () => {
         if (!chunk) return; // Avoid making requests if chunk is undefined/null
     
         console.log("Fetching chunk:", chunk);
-    
-        axios.get(`http://localhost:5000/utilities/analysis/get-chunk/${chunk}`)
-            .then(response => {
-                console.log("Response:", response.data.data);
-                setData(response.data.data); // Update data state
-                setSelectedModel(response.data.model); // Update model state
 
-                console.log("Chunk Data", response.data.data)
-            })
-            .catch(error => {
-                console.error("Error fetching chunk:", error);
-            });
-    }, [axios, chunk, setData, setSelectedModel])
+        const init = async () => {
+            const response = await getChunkData(chunk)
+
+            setData(response.data)
+            setSelectedModel(response.model)
+
+            console.log("Chunk Data", response.data)
+        }
+
+        init()
+    }, [chunk, setData, setSelectedModel, getChunkData])
 
     useEffect(() => {
         fetchChunks()
     }, [fetchChunks])
 
     useEffect(() => {
+        const init = async () => {
+            const response = await getModelClasses(selectedModel)
+            setModelClasses(response)
+        }
         if(selectedModel){
-            axios.get(`http://localhost:5000/utilities/analysis/get-model-classes/${selectedModel.toLowerCase()}`)
-                .then(response => {
-                    // console.log("Response:", response.data)
-                    setModelClasses(response.data)
-                })
+
+            init()
         }
     }, [setModelClasses, axios, selectedModel])
 
     useEffect(() => {
-        axios.get(`http://localhost:5000/utilities/analysis/get-all-analysts`)
-            .then(response => {
-                // console.log(response.data)
-                setAnalysts(response.data)
-            })
+        const init = async () => {
+            const response = getAllAnalysts()
+            setAnalysts(response)
+        }
+
+        init()
     }, [axios, setAnalysts])
 
     const handleDataUpdate = (index, updatedItem) => {
@@ -165,7 +170,7 @@ const ChunkAnalysis = () => {
                             />
                         ))}
                     </div>
-                    <div style={{ textAlign: 'center', margin: '20px 0' }}>
+                    {/* <div style={{ textAlign: 'center', margin: '20px 0' }}>
                         <Button
                             type="primary"
                             icon={<DownloadOutlined />}
@@ -174,7 +179,7 @@ const ChunkAnalysis = () => {
                         >
                             Export Results
                         </Button>
-                    </div>
+                    </div> */}
                 </>
             )}
 

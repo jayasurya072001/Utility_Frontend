@@ -8,14 +8,14 @@ import {
 } from '@ant-design/icons';
 
 import '../styles.css';
-import { fetchModels, startProcess } from "../util-api/api";
+import { fetchModels, getAllVersions, getThreshold, startProcess } from "../util-api/api";
 import toast from 'react-hot-toast';
-import axios from "axios";
 
 const { Option } = Select;
 
 const FreshLoadTest = () => {
-    const [modelsData, setModelsData] = useState({});
+    const [models, setModels] = useState([]);
+    const [modelVersions, setModelVersions] = useState([])
     const [selectedModel, setSelectedModel] = useState(null);
     const [selectedVersion, setSelectedVersion] = useState(null);
     const [emails, setEmails] = useState([]);
@@ -24,8 +24,7 @@ const FreshLoadTest = () => {
     useEffect(() => {
         const init = async () => {
             try {
-                const response = await axios.get("http://localhost:5000/utilities/analysis/get-threshold")
-                    .then(res => res.data)
+                const response = await getThreshold()
     
                 setThreshold(response?.threshold || "0.5")
             } catch(err) {
@@ -34,17 +33,29 @@ const FreshLoadTest = () => {
         }
 
         init()
-    }, [axios, setThreshold])
+    }, [setThreshold])
 
     useEffect(() => {
         const init = async () => {
-            setModelsData(await fetchModels())
+            setModels(await fetchModels())
         }
         init()
-    }, [fetchModels, setModelsData])
+    }, [fetchModels, setModels])
+
+    useEffect(() => {
+        const init = async () => {
+
+            const response = await getAllVersions(selectedModel)
+
+            setModelVersions(response)
+        }
+
+        selectedModel && init()
+    }, [setModelVersions, selectedModel])
 
     // Handle model change
     const handleModelChange = (value) => {
+        console.log("Handle Model Change", value)
         setSelectedModel(value);
         setSelectedVersion(null); // Reset version on model change
     };
@@ -87,17 +98,19 @@ const FreshLoadTest = () => {
                             className="dark-styled-select"
                             onChange={handleModelChange}
                             value={selectedModel}
+                            // filterOption={modelsData?.map(each => ({ label: each, value: each }))}
                             suffixIcon={<CaretDownOutlined className="dark-dropdown-icon" />}
                             // dropdownClassName="dark-dropdown-menu"
                         >
-                            {Object.keys(modelsData).map((model) => (
+                            {Array.isArray(models) && models?.map((model, i) => {
+                                return (
                                 <Option key={model} value={model}>
                                     <div className="dark-option-content">
                                         <RocketOutlined className="dark-option-icon" />
                                         <span>{model}</span>
                                     </div>
                                 </Option>
-                            ))}
+                            )})}
                         </Select>
                     </div>
 
@@ -114,7 +127,8 @@ const FreshLoadTest = () => {
                             // dropdownClassName="dark-dropdown-menu"
                         >
                             {selectedModel &&
-                                modelsData[selectedModel].map((version) => (
+                                Array.isArray(modelVersions) &&
+                                modelVersions.map((version) => (
                                     <Option key={version} value={version}>
                                         <div className="dark-option-content">
                                             <CodeOutlined className="dark-option-icon" />

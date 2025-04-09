@@ -1,16 +1,17 @@
 import { useCallback, useEffect, useState } from "react";
 import { Card, Spin, Button } from "antd";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { UploadOutlined, DownloadOutlined, CloseCircleOutlined, MergeCellsOutlined, ShrinkOutlined } from '@ant-design/icons';
 import "../styles.css";
 import toast from "react-hot-toast";
+import { getChunks, getSelectedModel, initiateMerge, canMerge } from "../util-api/api";
 
 const Chunks = () => {
   const [chunks, setChunks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedModel, setSelectedModel] = useState()
-  const [canMerge, setCanMerge] = useState(false)
+  const [CanMerge, setCanMerge] = useState(false)
+  const [filteredAnalyst, setFilteredAnalyst] = useState("")
 
   const navigate = useNavigate()
 
@@ -23,15 +24,14 @@ const Chunks = () => {
 
   const handleMerge = useCallback(() => {
     const init = async () => {
-      const response = await axios.get("http://localhost:5000/utilities/analysis/merge")
+      const response = await initiateMerge()
 
-      console.log(response.data)
 
-      if(response?.data?.message && response?.data?.message === "merge successful"){
-        toast.success(response.data.message)
+      if(response?.message && response?.message === "merge successful"){
+        toast.success(response.message)
 
       } else {
-        toast.error(response?.data?.error || "Cannot Merge")
+        toast.error(response?.error || "Cannot Merge")
       }
 
       setTimeout(() => {
@@ -39,23 +39,26 @@ const Chunks = () => {
       }, [2000])
     }
 
-    if(canMerge){
+    if(CanMerge){
       init()
     }
-  }, [canMerge, axios])
+  }, [CanMerge])
 
   useEffect(() => {
-    axios.get("http://localhost:5000/utilities/analysis/get-selected-model")
-      .then((response) => {
-        setSelectedModel(response?.model)
-      })
-  }, [axios, setSelectedModel])
+    const init = async () => {
+      const response = await getSelectedModel()
+      setSelectedModel(response?.model)
+    }
+
+    init()
+  }, [setSelectedModel])
 
   useEffect(() => {
     const fetchChunks = async () => {
+      console.log("Fetching Chunks")
       try {
-        const response = await axios.get("http://localhost:5000/utilities/analysis/get-chunks"); // Replace with actual API URL
-        setChunks(response.data);
+        const response = await getChunks()
+        setChunks(response);
       } catch (error) {
         console.error("Error fetching chunks:", error);
       } finally {
@@ -64,23 +67,23 @@ const Chunks = () => {
     };
 
     fetchChunks();
-  }, [axios, setLoading, setChunks]);
+  }, [setLoading, setChunks, getChunks]);
 
   useEffect(() => {
     const init = async () => {
-      const response = await axios.get("http://localhost:5000/utilities/analysis/can-merge")
+      const response = await canMerge()
 
-      if(response?.data){
-        setCanMerge(response.data["can-merge"])
+      if(response){
+        setCanMerge(response["can-merge"])
       }
     }
 
     init()
-  }, [setCanMerge, axios])
+  }, [setCanMerge])
 
   useEffect(() => {
-    console.log("can-merge", canMerge)
-  }, [canMerge])
+    console.log("can-merge", CanMerge)
+  }, [CanMerge])
 
   return (
     <div className="dark-app-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}>
@@ -114,7 +117,7 @@ const Chunks = () => {
       <div style={{ textAlign: 'center', margin: '20px 0' }}>
           <Button
               type="primary"
-              disabled={!canMerge}
+              disabled={!CanMerge}
               icon={<ShrinkOutlined />}
               onClick={handleMerge}
               className="export-btn"

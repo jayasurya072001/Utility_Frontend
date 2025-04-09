@@ -20,10 +20,9 @@ const { SubMenu } = Menu;
 const menuItems = [
   { key: "fresh-load", label: "Fresh Load Test", icon: <FileText /> },
   { key: "analysis", label: "Analysis", icon: <Settings />},
-  { key: "analysis-verification", label: "Analysis Validation", icon: <BarChart /> },
+  // { key: "analysis-verification", label: "Analysis Validation", icon: <BarChart /> },
   { key: "regression-load", label: "Regression Load Test", icon: <Repeat /> },
-  { key: "urlmodel-test", label: "Url Model Test", icon: <LinkIcon /> },
-  { key: "file-upload", label: "File Upload Model Test", icon: <Upload /> },
+  { key: "media-test", label: "Input Media Test", icon: <LinkIcon /> },
   { key: "generate-image", label: "Generate Image Url", icon: <Image /> },
   { key: "models-running", label: "Models Running Status", icon: <Cpu /> },
   { key: "models-training", label: "Models Training Status", icon: <Activity /> },
