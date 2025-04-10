@@ -17,6 +17,7 @@ import AdminLoginPage from "./pages/AdminLoginPage.jsx";
 import Chunks from "./pages/Chunks.jsx";
 import ChunkAnalysis from "./pages/ChunkAnalysis.jsx";
 import InputMediaTest from "./pages/InputMediaTest.jsx";
+import GenerateImageUrl from "./pages/GenerateImageUrl.jsx";
 
 const { Content } = Layout;
 
@@ -105,6 +106,7 @@ const App = () => {
             <Route path="/analysis/:chunk" element={<ChunkAnalysis />} />
             <Route path="/regression-load" element={<RegressionLoadTest />} />
             <Route path="/media-test" element={<InputMediaTest />} />
+            <Route path="/generate-image-url" element={<GenerateImageUrl />} />
             <Route path="/" element={<HomePage />} />
           </Routes>
         </Content>

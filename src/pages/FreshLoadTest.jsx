@@ -10,6 +10,7 @@ import {
 import '../styles.css';
 import { fetchModels, getAllVersions, getThreshold, startProcess } from "../util-api/api";
 import toast from 'react-hot-toast';
+import { useNavigate } from "react-router-dom";
 
 const { Option } = Select;
 
@@ -20,6 +21,7 @@ const FreshLoadTest = () => {
     const [selectedVersion, setSelectedVersion] = useState(null);
     const [emails, setEmails] = useState([]);
     const [threshold, setThreshold] = useState("0.5")
+    const navigate = useNavigate()
 
     useEffect(() => {
         const init = async () => {
@@ -71,7 +73,9 @@ const FreshLoadTest = () => {
         
         if(response.status == 202 || response.status == 200){
             toast.success(response.data?.message || "Process Started")
-        } else if(response.status == 409 || response.status == 400) {
+        } else if(response?.status == 409) {
+            navigate('/login')
+        } else if(response.status == 400) {
             console.log(response.data)
             toast.error(response.data.message)
             if(response.status == 400){

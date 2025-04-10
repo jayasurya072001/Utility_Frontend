@@ -1,58 +1,114 @@
 import axios from "axios";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL = 'http://localhost:5000';
 
-// export const fetchModels = async () => {
-//   try {
-//     const response = await axios.get(`${API_BASE_URL}/utility/models`);
-//     console.log(response)
-//     return response.data.models;
-//   } catch (error) {
-//     console.error("Error fetching models:", error);
-//     return {};
-//   }
-// };
+// Utility function for handling API errors
+const handleApiError = (error, customMessage = "API request failed") => {
+  console.error(customMessage, error);
+  if (error.response) {
+    return { status: error.response.status, data: error.response.data };
+  }
+  return { status: 500, data: { message: "Network error or server unavailable." } };
+};
+
+// Utility function to create axios instances with optional authorization
+const createApiInstance = (withAuth = false) => {
+  const instance = axios.create({
+    baseURL: API_BASE_URL,
+    timeout: 10000, // Example timeout
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  instance.interceptors.request.use(
+    (config) => {
+      if (withAuth) {
+        const token = sessionStorage.getItem('authToken'); // Assuming you store your token here
+        if (token) {
+          config.headers['Authorization'] = `Bearer ${token}`;
+        }
+      }
+      return config;
+    },
+    (error) => {
+      return Promise.reject(error);
+    }
+  );
+
+  instance.interceptors.response.use(
+    (response) => response,
+    (error) => Promise.reject(error)
+  );
+
+  return instance;
+};
+
+// API instance without authorization
+const publicApi = createApiInstance();
+
+// API instance with authorization
+const privateApi = createApiInstance(true);
+
+// API instance for multipart form data (e.g., file uploads)
+const formDataApi = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 30000, // Increased timeout for file uploads
+  headers: {
+    'Content-Type': 'multipart/form-data',
+  },
+});
+
+formDataApi.interceptors.request.use(
+  (config) => {
+    const token = sessionStorage.getItem('authToken');
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+formDataApi.interceptors.response.use(
+  (response) => response,
+  (error) => Promise.reject(error)
+);
 
 export const fetchModels = async () => {
   try {
-    const response = await axios.get(`http://localhost:5000/utilities/dynamic-test/all-models`);
+    const response = await privateApi.get(`/utilities/dynamic-test/all-models`);
     console.log(response.data);
-
-    return response.data
-  } catch(error) {
-    console.error("Error fetching model", error);
-    return {}
+    return response.data;
+  } catch (error) {
+    return handleApiError(error, "Error fetching models");
   }
-}
+};
 
 export const startProcess = async (version, model, recipients) => {
-
-  const data = { version, model, recipients }
+  const data = { version, model, recipients };
   try {
-    const response = await axios.post(`http://localhost:5000/utilities/dynamic-test/start-process`, data)
-
-    return response
+    const response = await privateApi.post(`/utilities/dynamic-test/start-process`, data);
+    return response;
   } catch (error) {
-    if (error.response && error.response.status === 409 || error.response.status == 400) {
+    if (error.response && (error.response.status === 409 || error.response.status === 400)) {
       console.warn("Process already exists or cannot be started.");
-      return { status: error.response.status, data: error.response.data }; // Handle it gracefully
+      return { status: error.response.status, data: error.response.data };
     }
-    console.error("Cannot Start Process", error);
-    return { status: error.response?.status || 500, data: {} }; // Return the status if available
+    return handleApiError(error, "Cannot Start Process");
   }
-}
+};
 
 export const runUrlModelTest = async (model, version, imageUrl) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/utility/url-upload`, {
+    const response = await privateApi.post(`/utility/url-upload`, {
       model,
       version,
       image_url: imageUrl,
     });
     return response.data.predictions;
   } catch (error) {
-    console.error("Error running URL Model Test:", error);
-    return { error: "Failed to process request" };
+    return handleApiError(error, "Error running URL Model Test");
   }
 };
 
@@ -62,124 +118,212 @@ export const runFileModelTest = async (model, version, file) => {
     formData.append("file", file);
     formData.append("model", model);
     formData.append("version", version);
- 
-    const response = await axios.post(`${API_BASE_URL}/utility/file-upload`, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
- 
+
+    const response = await formDataApi.post(`/utility/file-upload`, formData);
     return response.data.predictions;
   } catch (error) {
-    console.error("Error running File Model Test:", error);
-    return { error: "Failed to process request" };
+    return handleApiError(error, "Error running File Model Test");
   }
 };
 
 export const analysisCardHandleChange = async (chunk, inputMediaUrl) => {
-  return await axios.post("http://localhost:5000/utilities/analysis/unset-analysis", {
-    "chunk": chunk,
-    "inputMediaUrl": localData['inputMediaUrl']
-})
-}
+  try {
+    const response = await privateApi.post("/utilities/analysis/unset-analysis", {
+      chunk: chunk,
+      inputMediaUrl: inputMediaUrl // Assuming localData is accessible in this scope
+    });
+    return response.data;
+  } catch (error) {
+    return handleApiError(error, "Error handling analysis card change");
+  }
+};
 
 export const proofValidation = async (data) => {
-  return await axios.post("http://localhost:5000/utilities/analysis/proof-validation", data,
-    {
-        headers: {
-            "Content-Type": "application/json"
-        }
-    }).then(res => res.data)
-}
+  try {
+    const response = await privateApi.post("/utilities/analysis/proof-validation", data);
+    return response.data;
+  } catch (error) {
+    return handleApiError(error, "Error during proof validation");
+  }
+};
 
 export const setNotBug = async (chunk, inputMediaUrl) => {
-  return await axios.post("http://localhost:5000/utilities/analysis/set-notbug", {
-      "chunk": chunk,
-      "inputMediaUrl": inputMediaUrl
-  })
-}
+  try {
+    const response = await privateApi.post("/utilities/analysis/set-notbug", {
+      chunk: chunk,
+      inputMediaUrl: inputMediaUrl
+    });
+    return response.data;
+  } catch (error) {
+    return handleApiError(error, "Error setting not bug");
+  }
+};
 
 export const setOutlier = async (chunk, inputMediaUrl) => {
-  return await axios.post("http://localhost:5000/utilities/analysis/set-outlier", {
-      "chunk": chunk,
-      "inputMediaUrl": inputMediaUrl
-  })
-}
+  try {
+    const response = await privateApi.post("/utilities/analysis/set-outlier", {
+      chunk: chunk,
+      inputMediaUrl: inputMediaUrl
+    });
+    return response.data;
+  } catch (error) {
+    return handleApiError(error, "Error setting outlier");
+  }
+};
 
 export const getExpectedClasses = async (model) => {
-  return await axios.get(`http://localhost:5000/utilities/analysis/get-model-classes/${model}`)
-    .then(response => response.data)
-}
+  try {
+    const response = await privateApi.get(`/utilities/analysis/get-model-classes/${model}`);
+    return response.data;
+  } catch (error) {
+    return handleApiError(error, "Error fetching expected classes");
+  }
+};
 
 export const getThreshold = async () => {
-  return await axios.get("http://localhost:5000/utilities/analysis/get-threshold")
-    .then(response => response.data)
-}
+  try {
+    const response = await privateApi.get("/utilities/analysis/get-threshold");
+    return response.data;
+  } catch (error) {
+    return handleApiError(error, "Error fetching threshold");
+  }
+};
 
 export const getExpectedScore = async () => {
-  return await axios.get("http://localhost:5000/utilities/dynamic-test/get-expected-score")
-  .then(response => response.data)
-}
+  try {
+    const response = await privateApi.get("/utilities/dynamic-test/get-expected-score");
+    return response.data;
+  } catch (error) {
+    return handleApiError(error, "Error fetching expected score");
+  }
+};
 
 export const getChunkData = async (chunk) => {
-  return await axios.get(`http://localhost:5000/utilities/analysis/get-chunk/${chunk}`)
-    .then(response => response.data)
-    .catch(error => {
-      console.error("Error fetching chunk:", error)
-    })
-}
+  try {
+    const response = await privateApi.get(`/utilities/analysis/get-chunk/${chunk}`);
+    return response.data;
+  } catch (error) {
+    return handleApiError(error, `Error fetching chunk: ${chunk}`);
+  }
+};
 
 export const getChunks = async () => {
-  return await axios.get("http://localhost:5000/utilities/analysis/get-chunks")
-    .then(response => response.data)
-}
+  try {
+    const response = await privateApi.get("/utilities/analysis/get-chunks");
+    return response.data;
+  } catch (error) {
+    return handleApiError(error, "Error fetching chunks");
+  }
+};
 
 export const getModelClasses = async (model) => {
-  return await axios.get(`http://localhost:5000/utilities/analysis/get-model-classes/${model.toLowerCase()}`)
-    .then(response => response.data)
-}
+  try {
+    const response = await privateApi.get(`/utilities/analysis/get-model-classes/${model.toLowerCase()}`);
+    return response.data;
+  } catch (error) {
+    return handleApiError(error, `Error fetching classes for model: ${model}`);
+  }
+};
 
 export const getAllAnalysts = async () => {
-  return await axios.get(`http://localhost:5000/utilities/analysis/get-all-analysts`)
-    .then(response => response.data)
-}
+  try {
+    const response = await privateApi.get(`/utilities/analysis/get-all-analysts`);
+    return response.data;
+  } catch (error) {
+    return handleApiError(error, "Error fetching all analysts");
+  }
+};
 
 export const canMerge = async () => {
-  return await axios.get("http://localhost:5000/utilities/analysis/can-merge")
-    .then(response => response.data)
-}
+  try {
+    const response = await privateApi.get("/utilities/analysis/can-merge");
+    return response.data;
+  } catch (error) {
+    return handleApiError(error, "Error checking if merge is possible");
+  }
+};
 
 export const initiateMerge = async () => {
-  return await axios.get("http://localhost:5000/utilities/analysis/merge")
-    .then(response => response.data)
-}
+  try {
+    const response = await privateApi.get("/utilities/analysis/merge");
+    return response.data;
+  } catch (error) {
+    return handleApiError(error, "Error initiating merge");
+  }
+};
 
 export const getSelectedModel = async () => {
-  return await axios.get("http://localhost:5000/utilities/analysis/get-selected-model")
-    .then(response => response.data)
-}
+  try {
+    const response = await privateApi.get("/utilities/analysis/get-selected-model");
+    return response.data;
+  } catch (error) {
+    return handleApiError(error, "Error fetching selected model");
+  }
+};
 
 export const getAllVersions = async (model) => {
-  return await axios.get(`http://localhost:5000/utilities/dynamic-test/all-versions/${model}`)
-    .then(response => response.data)
-}
+  try {
+    const response = await privateApi.get(`/utilities/dynamic-test/all-versions/${model}`);
+    return response.data;
+  } catch (error) {
+    return handleApiError(error, `Error fetching versions for model: ${model}`);
+  }
+};
 
 export const getRegressionReady = async () => {
-  return await axios.get("http://localhost:5000/utilities/regression-test/get-regression-ready")
-    .then(response => response.data)
-}
+  try {
+    const response = await privateApi.get("/utilities/regression-test/get-regression-ready");
+    return response.data;
+  } catch (error) {
+    return handleApiError(error, "Error fetching regression ready status");
+  }
+};
 
 export const initiateRegressionTest = async (data = {}) => {
-  return await axios.post('http://localhost:5000/utilities/regression-test/run', data)
-    .then(response => response.data)
-}
+  try {
+    const response = await privateApi.post('/utilities/regression-test/run', data);
+    return response.data;
+  } catch (error) {
+    return handleApiError(error, "Error initiating regression test");
+  }
+};
 
 export const getSelectedVersion = async () => {
-  return axios.get(`http://localhost:5000/utilities/dynamic-test/get-selected-version`)
-    .then(res => res.data)
-}
+  try {
+    const response = await privateApi.get(`/utilities/dynamic-test/get-selected-version`);
+    return response.data;
+  } catch (error) {
+    return handleApiError(error, "Error fetching selected version");
+  }
+};
 
 export const getRegressionModel = async () => {
-  return await axios.get("http://localhost:5000/utilities/regression-test/get-regression-model")
-    .then(response => response.data)
-}
+  try {
+    const response = await privateApi.get("/utilities/regression-test/get-regression-model");
+    return response.data;
+  } catch (error) {
+    return handleApiError(error, "Error fetching regression model");
+  }
+};
+
+export const login = async (username, password) => {
+  try {
+    // const response = await publicApi.post("/utilities/login")
+
+    return { "authToken": "loggedin" };
+  } catch(error) {
+    return handleApiError(error, "Cannot Log In");
+  }
+};
+
+export const generateImageUrl = async (image) => {
+  try {
+    const formData = new FormData();
+    formData.append("image", image);
+
+    const response = await formDataApi.post(`/utilities/generate-image-url`, formData);
+    return response.data;
+  } catch (error) {
+    return handleApiError(error, "Error Uploading Image");
+  }
+};

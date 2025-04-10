@@ -23,7 +23,7 @@ const menuItems = [
   // { key: "analysis-verification", label: "Analysis Validation", icon: <BarChart /> },
   { key: "regression-load", label: "Regression Load Test", icon: <Repeat /> },
   { key: "media-test", label: "Input Media Test", icon: <LinkIcon /> },
-  { key: "generate-image", label: "Generate Image Url", icon: <Image /> },
+  { key: "generate-image-url", label: "Generate Image Url", icon: <Image /> },
   { key: "models-running", label: "Models Running Status", icon: <Cpu /> },
   { key: "models-training", label: "Models Training Status", icon: <Activity /> },
   
