@@ -112,7 +112,7 @@ const InputMediaTest = () => {
     setIsLoading(true);
     try {
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('image', file);
       formData.append('model', model);
       formData.append('version', version);
       
@@ -183,7 +183,7 @@ const InputMediaTest = () => {
                   >
                     {Array.isArray(models) && models.map((modelName) => (
                       <Option key={modelName} value={modelName}>
-                        <div style={{ color: "#e0e0e0" }}>{modelName}</div>
+                        <div style={{ color: "#000000" }}>{modelName}</div>
                       </Option>
                     ))}
                   </Select>
@@ -201,7 +201,7 @@ const InputMediaTest = () => {
                   >
                     {model && modelVersions && Array.isArray(modelVersions) && modelVersions?.map((version) => (
                       <Option key={version} value={version}>
-                        <div style={{ color: "#e0e0e0" }}>{version}</div>
+                        <div style={{ color: "#000000" }}>{version}</div>
                       </Option>
                     ))}
                   </Select>
@@ -280,7 +280,7 @@ const InputMediaTest = () => {
                   >
                     {modelNames.map((modelName) => (
                       <Option key={modelName} value={modelName}>
-                        <div style={{ color: "#e0e0e0" }}>{modelName}</div>
+                        <div style={{ color: "#000000" }}>{modelName}</div>
                       </Option>
                     ))}
                   </Select>
@@ -296,9 +296,9 @@ const InputMediaTest = () => {
                     style={{ width: "100%" }}
                     dropdownStyle={{ background: "#2a2a2a", border: "1px solid #444" }}
                   >
-                    {model && models && models[model]?.map((version) => (
+                    {model && modelVersions && Array.isArray(modelVersions) && modelVersions?.map((version) => (
                       <Option key={version} value={version}>
-                        <div style={{ color: "#e0e0e0" }}>{version}</div>
+                        <div style={{ color: "#000000" }}>{version}</div>
                       </Option>
                     ))}
                   </Select>

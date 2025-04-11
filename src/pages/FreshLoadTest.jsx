@@ -8,7 +8,7 @@ import {
 } from '@ant-design/icons';
 
 import '../styles.css';
-import { fetchModels, getAllVersions, getThreshold, startProcess } from "../util-api/api";
+import { fetchModels, getAllVersions, getExpectedScore, startProcess } from "../util-api/api";
 import toast from 'react-hot-toast';
 import { useNavigate } from "react-router-dom";
 
@@ -20,22 +20,22 @@ const FreshLoadTest = () => {
     const [selectedModel, setSelectedModel] = useState(null);
     const [selectedVersion, setSelectedVersion] = useState(null);
     const [emails, setEmails] = useState([]);
-    const [threshold, setThreshold] = useState("0.5")
+    const [expectedScore, setExpectedScore] = useState("0.5")
     const navigate = useNavigate()
 
     useEffect(() => {
         const init = async () => {
             try {
-                const response = await getThreshold()
+                const response = await getExpectedScore()
     
-                setThreshold(response?.threshold || "0.5")
+                setExpectedScore(response['expected-score'] || "0.5")
             } catch(err) {
-                console.error("Cannot Fetch Threshold", err)
+                console.error("Cannot Fetch Expected Score", err)
             }
         }
 
         init()
-    }, [setThreshold])
+    }, [setExpectedScore])
 
     useEffect(() => {
         const init = async () => {
@@ -69,25 +69,27 @@ const FreshLoadTest = () => {
     // Handle form submission
 
     const handleSubmit = useCallback(async () => {
-        const response = await startProcess(selectedVersion, selectedModel, emails)
+        if(selectedModel, selectedVersion, emails, expectedScore){
+            const response = await startProcess(selectedVersion, selectedModel, emails, expectedScore)
         
-        if(response.status == 202 || response.status == 200){
-            toast.success(response.data?.message || "Process Started")
-        } else if(response?.status == 409) {
-            navigate('/login')
-        } else if(response.status == 400) {
-            console.log(response.data)
-            toast.error(response.data.message)
-            if(response.status == 400){
-
-                response?.data?.errors?.map((each, i) => {
-                    toast.error(each)
-                })
+            if(response.status == 202 || response.status == 200){
+                toast.success(response.data?.message || "Process Started")
+            } else if(response?.status == 409) {
+                navigate('/login')
+            } else if(response.status == 400) {
+                console.log(response.data)
+                toast.error(response.data.message)
+                if(response.status == 400){
+    
+                    response?.data?.errors?.map((each, i) => {
+                        toast.error(each)
+                    })
+                }
+            } else {
+                toast.error("Cannot Start Process")
             }
-        } else {
-            toast.error("Cannot Start Process")
         }
-    }, [selectedVersion, selectedModel, emails])
+    }, [selectedVersion, selectedModel, emails, expectedScore])
 
     return (
         <div className="dark-app-container">
@@ -156,19 +158,19 @@ const FreshLoadTest = () => {
                         <div className="dark-input-hint">Press Enter to add multiple emails</div>
                     </div>
 
-                    {/* Set Threshold */}
+                    {/* Set ExpectedScore */}
                     <div className="dark-input-group">
-                        <label className="dark-input-label">Set Threshold</label>
+                        <label className="dark-input-label">Set Expected Score</label>
                         <Input
-                            placeholder="Set Threshold"
+                            placeholder="Set ExpectedScore"
                             className="input-field dark-styled-select"
-                            value={threshold}
+                            value={expectedScore}
                             onChange={(e) => {
-                                setThreshold(e.target.value)
+                                setExpectedScore(e.target.value)
                             }}
                         />
                     </div>
-                    <div className="dark-input-hint">{"0 < threshold <= 1"}</div>
+                    <div className="dark-input-hint">{"0 < expectedScore <= 1"}</div>
     
                     {/* Submit Button */}
                     <Button 

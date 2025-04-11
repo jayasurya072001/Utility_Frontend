@@ -1,0 +1,126 @@
+body {
+    margin: 0;
+    font-family: "Segoe UI", sans-serif;
+    background-color: #121212;
+    color: #e0e0e0;
+  }
+  
+  .chunk-dashboard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+    gap: 30px;
+  }
+  
+  .chunk-title {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: #ffffff;
+  }
+  
+  .search-input {
+    width: 320px;
+    padding: 12px 16px;
+    background-color: #1e1e1e;
+    border: 1px solid #333;
+    color: #ffffff;
+    border-radius: 8px;
+    font-size: 1rem;
+  }
+  
+  .search-input::placeholder {
+    color: #aaaaaa;
+  }
+  
+  .chunk-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    justify-content: center;
+    max-width: 1200px;
+    width: 100%;
+  }
+  
+  .chunk-card {
+    width: 250px;
+    background-color: #1f1f1f;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .chunk-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.6);
+  }
+  
+  .chunk-header {
+    background-color: #292929;
+    padding: 16px;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    border-bottom: 1px solid #444;
+    color: #ffffff;
+  }
+  
+  .chunk-body {
+    padding: 16px;
+    color: #dcdcdc;
+  }
+  
+  .chunk-body p {
+    margin: 8px 0;
+  }
+  
+  .chunk-body span {
+    color: #999999;
+    font-weight: 500;
+  }
+  
+  .chunk-footer {
+    background-color: #191919;
+    padding: 12px;
+    text-align: center;
+    color: #66ccff;
+    font-weight: bold;
+    border-top: 1px solid #333;
+  }
+  
+  .merge-button {
+    background-color: #4a90e2;
+    border: none;
+    color: white;
+    padding: 12px 24px;
+    font-size: 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .merge-button:hover {
+    background-color: #367cd6;
+  }
+  
+  .merge-button.disabled {
+    background-color: #555 !important;
+    cursor: not-allowed;
+  }
+  
+  .loader {
+    border: 6px solid #333;
+    border-top: 6px solid #4a90e2;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    animation: spin 1s linear infinite;
+    margin: 40px auto;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  

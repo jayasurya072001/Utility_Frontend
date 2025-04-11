@@ -1,0 +1,15 @@
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+  }
+  
+  .chunk-dashboard .ant-pagination-item-active {
+    background-color: #1890ff;
+    border-color: #1890ff;
+  }
+  
+  .chunk-dashboard .ant-pagination-item-active a {
+    color: white;
+  }
+  

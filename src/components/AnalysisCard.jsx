@@ -4,14 +4,14 @@ import { ExpandOutlined, LinkOutlined } from '@ant-design/icons';
 import '../css/analysis-card.css'
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import { analysisCardHandleChange, proofValidation, setNotBug, setOutlier } from '../util-api/api';
+import { analysisCardHandleChange, getChunkData, proofValidation, setNotBug, setOutlier } from '../util-api/api';
 import { parse } from 'papaparse';
 
 const { Text } = Typography;
 const { Option } = Select;
 const { TextArea } = Input;
 
-const AnalysisCard = ({ data, onUpdate, expectedClasses, analysts, onPreview, chunk, fetchChunks, expectedScore }) => {
+const AnalysisCard = ({ data, onUpdate, expectedClasses, analysts, onPreview, chunk, expectedScore }) => {
     const [localData, setLocalData] = useState(data);
     const [predictionClasses, setPredictionClasses] = useState(null)
     const [reproducedUrls, setReproducedUrls] = useState([])
@@ -19,6 +19,13 @@ const AnalysisCard = ({ data, onUpdate, expectedClasses, analysts, onPreview, ch
     const [expectedClassesOptions, setExpectedClassesOptions] = useState([])
     const [validationLoading, setValidationLoading] = useState(false)
     const [parsedPredictedClasses, setParsedPredictedClasses] = useState({})
+    const [selectedButton, setSelectedButton] = useState('')
+    const [bugDropDown, setBugDropDown] = useState(false)
+
+    useEffect(() => {
+      console.log("Local Data", localData)
+      setSelectedButton(localData["Analysis"])
+    }, [localData, setSelectedButton])
 
     useEffect(() => {
         if(Array.isArray(expectedClasses)) {
@@ -95,7 +102,7 @@ const AnalysisCard = ({ data, onUpdate, expectedClasses, analysts, onPreview, ch
         }, 1500);
     };
 
-    const validate = useCallback(async () => {
+    const handleValidateClick = useCallback(async () => {
         setValidationLoading(true)
         const d = {
             "inputMediaUrl": data["inputMediaUrl"],
@@ -116,12 +123,14 @@ const AnalysisCard = ({ data, onUpdate, expectedClasses, analysts, onPreview, ch
         console.log("Validation Response", response)
         console.log("IU", response?.invalid_urls)
         console.log("IUL", response?.invalid_urls?.length)
-        setValidationLoading(false)
-    }, [data, reproducedUrls, selectedExpectedClasses, setValidationLoading])
 
-    const handleValidateClick = useCallback(() => {
-        validate()
-    }, [validate])
+        const refetchedData = await getChunkData(chunk, data["inputMediaUrl"])
+        console.log("Refetched Data", refetchedData)
+        setLocalData(refetchedData?.data[0])
+
+        setValidationLoading(false)
+        setBugDropDown(false)
+    }, [data, reproducedUrls, selectedExpectedClasses, setValidationLoading, setBugDropDown, setLocalData])
 
     const handleReproducedUrlChange = useCallback((e) => {
         setReproducedUrls(e)
@@ -129,23 +138,33 @@ const AnalysisCard = ({ data, onUpdate, expectedClasses, analysts, onPreview, ch
 
     const setNotBugHandler = useCallback(() => {
         const init = async () => {
-            const response = setNotBug(chunk, data["inputMediaUrl"])
+            setSelectedButton('Not Bug')
+            console.log("URL", data['inputMediaUrl'])
+            console.log("chunk", chunk)
+            const response = await setNotBug(chunk, data["inputMediaUrl"])
 
-            fetchChunks()
+            const refetchedData = await getChunkData(chunk, data["inputMediaUrl"])
+            console.log("Refetched Data", refetchedData)
+            setLocalData(refetchedData?.data[0])
         }
 
         init()
-    }, [data, chunk, fetchChunks])
+    }, [data, chunk, setSelectedButton, setLocalData, getChunkData])
 
     const setOutlierHandler = useCallback(() => {
         const init = async () => {
-            const response = setOutlier(chunk, data["inputMediaUrl"])
+            setSelectedButton('Outlier')
+            console.log("URL", data['inputMediaUrl'])
+            console.log("chunk", chunk)
+            const response = await setOutlier(chunk, data["inputMediaUrl"])
 
-            fetchChunks()
+            const refetchedData = await getChunkData(chunk, data["inputMediaUrl"])
+            console.log("Refetched Data", refetchedData)
+            setLocalData(refetchedData?.data[0])
         }
 
         init()
-    }, [data, chunk, fetchChunks])
+    }, [data, chunk, setSelectedButton, setLocalData, getChunkData])
 
     useEffect(() => {
       try {
@@ -160,126 +179,119 @@ const AnalysisCard = ({ data, onUpdate, expectedClasses, analysts, onPreview, ch
     
 
     return (
-        <Card className="analysis-card">
-          <div className="card-content">
-            <div className="image-section">
-              <img
-                src={data["inputMediaUrl"]}
-                alt="Media preview"
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src = 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Crect width="100" height="100" fill="%23111"/%3E%3Ctext x="50%" y="50%" font-family="sans-serif" font-size="12" fill="%23888" text-anchor="middle" dominant-baseline="middle"%3EImage not available%3C/text%3E%3C/svg%3E';
-                }}
-              />
-              <div className="image-actions">
-                <Button
-                  icon={<ExpandOutlined />}
-                  onClick={() => onPreview(data["inputMediaUrl"])}
-                  className="action-btn"
-                />
-                <Button
-                  icon={<LinkOutlined />}
-                  onClick={copyImageUrl}
-                  className="action-btn"
-                />
-              </div>
-            </div>
-      
-            <div className="data-section">
-              <Text className="meta-field"><span>Result:</span> {data["Result"] || '-'}</Text>
-              <Text className="meta-field"><span>Projection:</span> {data['Projection Layer'] || '-'}</Text>
-              <Text className="meta-field"><span>Detection:</span> {data['Detection Layer'] || '-'}</Text>
-              <Text className="meta-field">
-              <span>Prediction:</span>
-              {Object.keys(parsedPredictedClasses).length > 0 ? (
-                Object.entries(parsedPredictedClasses).map(([key, value]) => (
-                  <span key={key} style={{ color: Number(value) >= Number(expectedScore) ? '#32CD32' : '#FF3737' }}>
-                    {key}: {value.toFixed(4)}<br />
-                  </span>
-                ))
-              ) : (
-                '-'
-              )}
-            </Text>
-              <div className="analysis-buttons">
-                <Button
-                  type={localData.Analysis === 'Bug' ? 'primary' : 'default'}
-                  onClick={() => toggleAnalysis('Bug')}
-                  className="analysis-btn"
-                >
-                  Bug
-                </Button>
-                <Button
-                  type={localData.Analysis === 'Not Bug' ? 'primary' : 'default'}
-                  onClick={() => {
-                    toggleAnalysis('Not Bug')
-                    setNotBugHandler()
-                  }}
-                  className="analysis-btn"
-                >
-                  Not Bug
-                </Button>
-                <Button
-                  type={localData.Analysis === 'Outlier' ? 'primary' : 'default'}
-                  onClick={() => {
-                    toggleAnalysis('Outlier')
-                    setOutlierHandler()
-                  }}
-                  className="analysis-btn"
-                >
-                  Outlier
-                </Button>
-              </div>
-      
-              {localData.Analysis === 'Bug' && localData?.Validation && (
-                <div className="bug-fields">
-                  <div className="form-field">
-                    <label>Expected Classes</label>
-                    <Select
-                      mode="multiple"
-                      options={expectedClassesOptions}
-                      value={selectedExpectedClasses}
-                      onChange={(val) => {
-                        handleChange('ExpectedClasses', val)
-                        setSelectedExpectedClasses(val)
-                      }}
-                      placeholder="Select Expected classes"
-                      className="input-field expected-classes-select"
-                      style={{ width: '100%' }}
-                    />
-                  </div>
-      
-                  <div className="form-field">
-                    <label>Reproduced Bugs URLs</label>
-                    <Select
-                      mode="tags"
-                      placeholder="Enter reproduced bugs urls..."
-                      className="dark-styled-select input-field reproduced-urls-select"
-                      value={reproducedUrls}
-                      onChange={handleReproducedUrlChange}
-                      style={{ width: '100%' }}
-                      maxTagTextLength={25} /* Hard truncate at 25 chars (optional) */
-                    />
-                  </div>
-      
-                  {validationLoading ? 
-                    <>
-                      <Spin />
-                    </> : 
-                    <Button
-                      onClick={handleValidateClick}
-                      className='validation-btn'
-                      disabled={validationLoading}
-                    >
-                      Validate
-                    </Button>
-                  }
-                </div>
-              )}
-            </div>
+      <div className="analysis-card">
+        <div className="image-section">
+          <img
+            src={data["inputMediaUrl"]}
+            alt="Preview"
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src =
+                "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23111'/%3E%3Ctext x='50%' y='50%' font-family='sans-serif' font-size='12' fill='%23888' text-anchor='middle' dominant-baseline='middle'%3EImage not available%3C/text%3E%3C/svg%3E";
+            }}
+          />
+          <div className="image-actions">
+            <Button icon={<ExpandOutlined />} onClick={() => onPreview(data["inputMediaUrl"])} />
+            <Button icon={<LinkOutlined />} onClick={copyImageUrl} />
           </div>
-        </Card>
-      );
+        </div>
+  
+        <div className="card-info">
+          <p><span>Result:</span> {data["Result"] || "-"}</p>
+          <p><span>Projection:</span> {data["Projection Layer"] || "-"}</p>
+          <p><span>Detection:</span> {data["Detection Layer"] || "-"}</p>
+          <div className="predictions">
+            <span>Prediction:</span>
+            {Object.keys(parsedPredictedClasses).length > 0 ? (
+              Object.entries(parsedPredictedClasses).map(([key, value]) => (
+                <span
+                  key={key}
+                  style={{
+                    color: Number(value) >= Number(expectedScore) ? "#32CD32" : "#FF3737",
+                    display: "block",
+                  }}
+                >
+                  {key}: {value.toFixed(4)}
+                </span>
+              ))
+            ) : (
+              <span>-</span>
+            )}
+          </div>
+  
+          <div className="analysis-actions">
+            {/* {["Bug", "Not Bug", "Outlier"].map((label) => (
+              <Button
+                key={label}
+                type={localData.Analysis === label ? "primary" : "default"}
+                onClick={() => toggleAnalysis(label)}
+              >
+                {label}
+              </Button>
+            ))} */}
+            <Button
+              type={selectedButton === "Bug" ? "primary": "default"}
+              onClick={() => {
+                setBugDropDown(true)
+                setSelectedButton("Bug")
+              }}
+            >
+              Bug
+            </Button>
+            <Button
+              type={selectedButton === "Not Bug" ? "primary": "default"}
+              onClick={setNotBugHandler}
+            >
+              Not Bug
+            </Button>
+            <Button
+              type={selectedButton === "Outlier" ? "primary": "default"}
+              onClick={setOutlierHandler}
+            >
+              Outlier
+            </Button>
+          </div>
+  
+          {bugDropDown && (
+            <div className="bug-section">
+              <div className="form-group">
+                <label>Expected Classes</label>
+                <Select
+                  mode="multiple"
+                  value={selectedExpectedClasses}
+                  onChange={(val) => {
+                    handleChange("ExpectedClasses", val);
+                    setSelectedExpectedClasses(val);
+                  }}
+                  options={expectedClassesOptions}
+                  placeholder="Select Expected Classes"
+                  style={{ width: "100%" }}
+                />
+              </div>
+  
+              <div className="form-group">
+                <label>Reproduced Bug URLs</label>
+                <Select
+                  mode="tags"
+                  placeholder="Enter URLs"
+                  value={reproducedUrls}
+                  onChange={handleReproducedUrlChange}
+                  style={{ width: "100%" }}
+                />
+              </div>
+  
+              {validationLoading ? (
+                <Spin />
+              ) : (
+                <Button onClick={handleValidateClick} className="validate-btn">
+                  Validate
+                </Button>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    );
       
 };
 

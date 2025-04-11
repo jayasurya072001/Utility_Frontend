@@ -1,0 +1,22 @@
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    margin: 24px 0;
+  }
+  
+  .analysis-container .ant-pagination-item-active {
+    background-color: #1890ff;
+    border-color: #1890ff;
+  }
+  
+  .analysis-container .ant-pagination-item-active a {
+    color: white;
+  }
+  
+  .csv-buttons {
+    display: flex;
+    justify-content: center;
+    margin: 16px 0;
+    gap: 12px;
+  }
+  

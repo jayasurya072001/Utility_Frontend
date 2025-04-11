@@ -15,7 +15,7 @@ const handleApiError = (error, customMessage = "API request failed") => {
 const createApiInstance = (withAuth = false) => {
   const instance = axios.create({
     baseURL: API_BASE_URL,
-    timeout: 10000, // Example timeout
+    timeout: 30000, // Example timeout
     headers: {
       'Content-Type': 'application/json',
     },
@@ -85,8 +85,9 @@ export const fetchModels = async () => {
   }
 };
 
-export const startProcess = async (version, model, recipients) => {
-  const data = { version, model, recipients };
+export const startProcess = async (version, model, recipients, expectedScore) => {
+  const data = { version, model, recipients, expectedScore };
+  console.log("Data", data)
   try {
     const response = await privateApi.post(`/utilities/dynamic-test/start-process`, data);
     return response;
@@ -101,26 +102,23 @@ export const startProcess = async (version, model, recipients) => {
 
 export const runUrlModelTest = async (model, version, imageUrl) => {
   try {
-    const response = await privateApi.post(`/utility/url-upload`, {
+    const response = await privateApi.post(`/utilities/prediction/url-upload`, {
       model,
       version,
-      image_url: imageUrl,
+      inputMediaUrl: imageUrl,
     });
     return response.data.predictions;
-  } catch (error) {
+  } catch (error) {``
     return handleApiError(error, "Error running URL Model Test");
   }
 };
 
-export const runFileModelTest = async (model, version, file) => {
+export const runFileModelTest = async (formData) => {
   try {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("model", model);
-    formData.append("version", version);
-
-    const response = await formDataApi.post(`/utility/file-upload`, formData);
-    return response.data.predictions;
+    const response = await formDataApi.post(`/utilities/prediction/file-upload`, formData);
+    const predictions = response?.data?.predictions
+    console.log(predictions)
+    return predictions;
   } catch (error) {
     return handleApiError(error, "Error running File Model Test");
   }
@@ -198,12 +196,23 @@ export const getExpectedScore = async () => {
   }
 };
 
-export const getChunkData = async (chunk) => {
-  try {
-    const response = await privateApi.get(`/utilities/analysis/get-chunk/${chunk}`);
-    return response.data;
-  } catch (error) {
-    return handleApiError(error, `Error fetching chunk: ${chunk}`);
+export const getChunkData = async (chunk, inputMediaUrl) => {
+  if(chunk && inputMediaUrl){
+    try {
+      const response = await privateApi.get(`/utilities/analysis/get-chunk/${chunk}?inputMediaUrl=${inputMediaUrl}`);
+      return response.data;
+    } catch (error) {
+      return handleApiError(error, `Error fetching chunk: ${chunk}`);
+    }
+  } else if(chunk){
+    try{
+      const response = await privateApi.get(`/utilities/analysis/get-chunk/${chunk}`)
+      return response.data;
+    } catch(error) {
+      return handleApiError(error, `Error fetching chunk: ${chunk}`);
+    }
+  } else {
+    return {"error": "insufficient information", "status": 400}
   }
 };
 

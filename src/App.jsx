@@ -99,7 +99,7 @@ const App = () => {
           <Routes>
             <Route path="/login" element={<LoginPage />} />
             <Route path="/adminlogin" element={<AdminLoginPage />} />
-            <Route path="/signup" element={<SignupPage />} />
+            <Route path="/register" element={<SignupPage />} />
             <Route path="/fresh-load" element={<FreshLoadTest />} />
             <Route path="/analysis-verification" element={<AnalysisVerification />} />
             <Route path="/analysis" element={<Chunks />} />

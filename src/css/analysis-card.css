@@ -1,169 +1,79 @@
-/* Global Styles */
-
 .analysis-card {
-    background-color: #1a1a1a;
-    padding: 16px;
-    border-radius: 6px;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
-  }
-  
-  .card-content {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .image-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 20px;
-  }
-  
-  .image-section img {
-    max-width: 100%;
-    height: auto;
-    margin-bottom: 10px;
-  }
-  
-  .image-actions {
-    display: flex;
-    gap: 8px;
-  }
-  
-  .action-btn {
-    width: 32px;
-    height: 32px;
-    background: rgba(0, 0, 0, 0.7) !important;
-    border: none !important;
-    color: white !important;
-    border-radius: 50% !important;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  /* Data Section */
-  
-  .data-section {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .meta-field {
-    margin-bottom: 10px;
-  }
-  
-  .meta-field span {
-    font-weight: bold;
-  }
-  
-  .analysis-buttons {
-    margin-bottom: 20px;
-  }
-  
-  .analysis-btn {
-    margin-right: 10px;
-  }
-  
-  /* Bug Fields */
-  
-  .bug-fields {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .form-field {
-    margin-bottom: 20px;
-  }
-  
-  .form-field label {
-    display: block;
-    margin-bottom: 8px;
-    color: #f1eded;
-    font-size: 14px;
-  }
-  
-  .input-field {
-    background-color: #1a1a1a;
-    border-color: #444;
-    color: #e0e0e0;
-    min-height: 32px;
-    padding: 1px 11px;
-  }
-  
-  .expected-classes-select,
-  .reproduced-urls-select {
-    max-width: 100%;
-    overflow: hidden;
-  }
-  
-  /* Ant Design Specific Styles */
-  
-  .ant-select-dropdown {
-    background-color: #2a2a2a !important;
-    border: 1px solid #444 !important;
-    border-radius: 6px !important;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3) !important;
-  }
-  
-  .ant-select-item {
-    color: #e0e0e0 !important;
-    font-size: 14px !important;
-    padding: 10px 16px !important;
-  }
-  
-  .ant-select-item-option:hover {
-    background-color: #333 !important;
-  }
-  
-  .ant-select-item-option-selected {
-    background-color: #272829 !important;
-    color: white !important;
-  }
-  
-  .ant-select-item-option-selected:hover {
-    background-color: #272829 !important;
-  }
-  
-  .ant-select-selection-item {
-    color: white !important;
-    border-radius: 4px !important;
-    padding: 0 8px !important;
-    max-width: 150px; /* Adjust as needed */
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  
-  .ant-select-selection-placeholder {
-    color: rgba(255, 255, 255, 0.6) !important;
-    opacity: 1 !important;
-  }
-  
-  .ant-select-selector {
-    background-color: #1a1a1a !important;
-    border-color: #444 !important;
-    color: #e0e0e0 !important;
-    min-height: 32px !important;
-    padding: 1px 11px !important;
-  }
-  
-  .ant-select-arrow {
-    color: #888 !important;
-  }
-  
-  .ant-select-multiple .ant-select-selection-item-remove {
-    color: white !important;
-  }
-  
-  .ant-select-clear {
-    background: #2a2a2a !important;
-    color: #888 !important;
-  }
-  
-  .ant-select-dropdown .ant-select-dropdown-search input {
-    background-color: #1a1a1a !important;
-    color: #e0e0e0 !important;
-    border-color: #444 !important;
-  }
-  
+  background-color: #1e1e1e;
+  border-radius: 12px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+  color: #d0d0d0;
+}
+
+.image-section {
+  position: relative;
+  width: 100%;
+  height: 180px;
+  background-color: #111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.image-section img {
+  max-width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-actions {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 8px;
+}
+
+.card-info {
+  padding: 16px;
+  font-size: 0.95rem;
+}
+
+.card-info p {
+  margin: 6px 0;
+}
+
+.card-info span {
+  color: #999;
+  font-weight: 500;
+}
+
+.predictions {
+  margin: 10px 0;
+}
+
+.analysis-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.bug-section {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.validate-btn {
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+}
+
+.validate-btn:hover {
+  background-color: #367cd6;
+}

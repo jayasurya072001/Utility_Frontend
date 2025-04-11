@@ -1,0 +1,39 @@
+.input-media-test-container {
+    min-height: 90vh;
+    padding: 24px;
+  }
+  
+  .input-media-test-card {
+    background: #1a1a1a;
+    border-radius: 12px;
+  }
+  
+  .input-media-test-title {
+    display: flex;
+  }
+  
+  .input-media-test-icon {
+    font-size: 28px;
+  }
+  
+  .input-label {
+    color: #aaa;
+  }
+  
+  .input-select,
+  .input-url {
+    width: 100%;
+  }
+  
+  .file-dragger {
+    background: #252525;
+  }
+  
+  .image-preview-container {
+    margin-top: 16px;
+  }
+  
+  .image-preview {
+    max-width: 100%;
+  }
+  
