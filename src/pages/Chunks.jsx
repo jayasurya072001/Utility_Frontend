@@ -18,6 +18,7 @@ const Chunks = () => {
   const [CanMerge, setCanMerge] = useState(false);
   const [filteredAnalyst, setFilteredAnalyst] = useState("");
   const [filteredChunks, setFilteredChunks] = useState([]);
+  const [paginatedChunks, setPaginatedChunks] = useState([])
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -69,9 +70,15 @@ const Chunks = () => {
 
   useEffect(() => {
     const fetchChunks = async () => {
+      setLoading(true)
       try {
         const response = await getChunks();
-        setChunks(response);
+        if(response.status === 401){
+          navigate('/login')
+        }
+        if(response?.data){
+          setChunks(response.data)
+        }
       } catch (error) {
         console.error("Error fetching chunks:", error);
       } finally {
@@ -79,7 +86,7 @@ const Chunks = () => {
       }
     };
     fetchChunks();
-  }, []);
+  }, [getChunks, navigate, setChunks, setLoading]);
 
   useEffect(() => {
     const init = async () => {
@@ -96,10 +103,14 @@ const Chunks = () => {
     setCurrentPage(1); // reset to first page on search
   }, []);
 
-  const paginatedChunks = filteredChunks.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  useEffect(() => {
+    if(Array.isArray(filteredChunks)){
+      setPaginatedChunks(filteredChunks?.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+      ))
+    }
+  }, [filteredChunks, setPaginatedChunks])
 
   return (
     <div className="chunk-dashboard">

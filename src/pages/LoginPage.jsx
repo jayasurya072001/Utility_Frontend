@@ -4,7 +4,7 @@ import { login } from '../util-api/api';
 import { useNavigate } from 'react-router-dom';
 
 const LoginPage = () => {
-  const [username, setUsername] = useState('');
+  const [empid, setEmpid] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate()
@@ -12,10 +12,10 @@ const LoginPage = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     // In a real application, you would send these credentials to your backend
-    if (username && password) {
-      const response = await login(username, password)
+    if (empid && password) {
+      const response = await login(empid, password)
       if(response?.authToken){
-        window.sessionStorage.setItem("authToken", response.authToken)
+        window.localStorage.setItem("authToken", response.authToken)
         navigate('/')
         setError('');
       } else {
@@ -23,7 +23,7 @@ const LoginPage = () => {
       }
       // Redirect to your main application page here
     } else {
-      setError('Invalid username or password.');
+      setError('Invalid employee id or password.');
     }
   };
 
@@ -33,12 +33,12 @@ const LoginPage = () => {
         <h2 className="login-title">Login</h2>
         <form onSubmit={handleLogin}>
           <div className="input-group">
-            <label htmlFor="username">Username</label>
+            <label htmlFor="empid">Employee ID</label>
             <input
               type="text"
-              id="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              id="empid"
+              value={empid}
+              onChange={(e) => setEmpid(e.target.value)}
               required
             />
           </div>

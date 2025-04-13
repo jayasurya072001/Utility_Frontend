@@ -5,6 +5,7 @@ import axios, { all } from "axios";
 
 import { fetchModels, getAllVersions, getRegressionModel, getRegressionReady, getSelectedVersion, initiateRegressionTest } from "../util-api/api";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const { Option } = Select;
 const { Dragger } = Upload;
@@ -17,6 +18,8 @@ const RegressionLoadTest = () => {
   const [models, setModels] = useState([])
   const [modelVersions, setModelVersions] = useState("")
   const [regressionReady, setRegressionReady] = useState(false)
+
+  const navigate = useNavigate()
 
   // const models = ["Model A", "Model B", "Model C"];
   // const versions = { 
@@ -63,8 +66,12 @@ const RegressionLoadTest = () => {
 
     try {
       const response = await initiateRegressionTest({model: selectedModel, version: selectedVersion})
-      console.log('Request successful:', response);
-      toast.success(response?.message)
+      if(response.status == 200){
+        console.log('Request successful:', response);
+        toast.success(response.data?.message)
+      } else if(response.status == 409 || response.status == 400) {
+        toast.error(response?.error)
+      }
       return response; // or whatever you want to return
     } catch (error) {
       if (error.response) {
@@ -107,7 +114,12 @@ const RegressionLoadTest = () => {
 
   useEffect(() => {
       const init = async () => {
-          setModels(await fetchModels())
+          const response = await fetchModels()
+
+          if(response.status === 401){
+            navigate("/login")
+          }
+          setModels(response)
       }
       init()
   }, [fetchModels, setModels])

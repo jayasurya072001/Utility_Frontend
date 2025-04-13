@@ -11,7 +11,7 @@ const { Text } = Typography;
 const { Option } = Select;
 const { TextArea } = Input;
 
-const AnalysisCard = ({ data, onUpdate, expectedClasses, analysts, onPreview, chunk, expectedScore }) => {
+const AnalysisCard = ({ data, onUpdate, expectedClasses, onPreview, chunk, expectedScore }) => {
     const [localData, setLocalData] = useState(data);
     const [predictionClasses, setPredictionClasses] = useState(null)
     const [reproducedUrls, setReproducedUrls] = useState([])
@@ -21,6 +21,13 @@ const AnalysisCard = ({ data, onUpdate, expectedClasses, analysts, onPreview, ch
     const [parsedPredictedClasses, setParsedPredictedClasses] = useState({})
     const [selectedButton, setSelectedButton] = useState('')
     const [bugDropDown, setBugDropDown] = useState(false)
+
+    useEffect(() => {
+      if(selectedButton !== 'Bug'){
+        console.log('meow', selectedButton)
+        setBugDropDown(false)
+      }
+    }, [selectedButton, setBugDropDown])
 
     useEffect(() => {
       console.log("Local Data", localData)
@@ -260,7 +267,7 @@ const AnalysisCard = ({ data, onUpdate, expectedClasses, analysts, onPreview, ch
                   mode="multiple"
                   value={selectedExpectedClasses}
                   onChange={(val) => {
-                    handleChange("ExpectedClasses", val);
+                    // handleChange("ExpectedClasses", val);
                     setSelectedExpectedClasses(val);
                   }}
                   options={expectedClassesOptions}

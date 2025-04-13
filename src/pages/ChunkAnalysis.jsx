@@ -4,7 +4,6 @@ import { UploadOutlined, DownloadOutlined, CloseCircleOutlined } from '@ant-desi
 import Papa from 'papaparse';
 import AnalysisCard from '../components/AnalysisCard';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
 import '../css/chunk-analysis.css';
 import '../css/popup-image-viewer.css';
 import '../css/analysis-pagination.css'
@@ -14,7 +13,8 @@ import {
   getChunkData,
   getExpectedClasses,
   getModelClasses,
-  getExpectedScore
+  getExpectedScore,
+  setAnalyst
 } from '../util-api/api';
 
 const { Title } = Typography;
@@ -29,6 +29,7 @@ const ChunkAnalysis = () => {
   const [isPreviewVisible, setIsPreviewVisible] = useState(false);
   const [modelClasses, setModelClasses] = useState([]);
   const [analysts, setAnalysts] = useState([]);
+  const [selectedAnalyst, setSelectedAnalyst] = useState('')
   const [expectedScore, setExpectedScore] = useState("0.5");
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -57,21 +58,22 @@ const ChunkAnalysis = () => {
     }
   }, [selectedModel]);
 
-  const fetchChunks = useCallback(() => {
-    if (!chunk) return;
-
+  useEffect(() => {
     const init = async () => {
-      const response = await getChunkData(chunk);
-      setData(response.data);
-      setSelectedModel(response.model);
+      var response = await getChunkData(chunk);
+      if(typeof(response) == 'string'){
+        response = JSON.parse(response)
+      }
+      console.log('response', typeof(response))
+      response?.data && setData(response.data);
+      response?.model && setSelectedModel(response.model);
+      response?.analyst && setSelectedAnalyst(response.analyst);
     };
 
-    init();
-  }, [chunk]);
-
-  useEffect(() => {
-    fetchChunks();
-  }, [fetchChunks]);
+    if(chunk){  
+      init();
+    }
+  }, [chunk, getChunkData, setData, setSelectedAnalyst, setSelectedModel]);
 
   useEffect(() => {
     const init = async () => {
@@ -161,12 +163,39 @@ const ChunkAnalysis = () => {
     }, 1500);
   };
 
+  const handleAnalystChange = useCallback(async (value) => {
+    const response = await setAnalyst(value, chunk)
+
+    if(response.status === 200){
+      setSelectedAnalyst(value)
+    }
+  }, [setSelectedAnalyst])
+
   const paginatedData = data.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   return (
     <div className="analysis-container">
       <div className="header-controls">
         <span>Model: {selectedModel}</span>
+        {analysts.length > 0 && (
+          <div style={{ marginLeft: '20px' }}>
+            <span style={{ marginRight: '8px' }}>Analyst:</span>
+            <Select
+              style={{ width: 200 }}
+              placeholder="Select Analyst"
+              value={analysts.some(a => `${a.full_name} (${a.emp_id})` === selectedAnalyst) ? selectedAnalyst : undefined}
+              onChange={handleAnalystChange}
+            >
+              {analysts.map((eachAnalyst) => {
+                const s = `${eachAnalyst['full_name']} (${eachAnalyst['emp_id']})`
+                return (
+                <Option key={s} value={s}>
+                  {s}
+                </Option>
+              )})}
+            </Select>
+          </div>
+        )}
         <div className="csv-buttons">
           <Button icon={<DownloadOutlined />} onClick={handleExportPageCSV} style={{ marginRight: '10px' }}>
             Export This Page to CSV
@@ -186,7 +215,6 @@ const ChunkAnalysis = () => {
                 data={{ ...item, expectedScore }}
                 onUpdate={(updatedItem) => handleDataUpdate(index + (currentPage - 1) * itemsPerPage, updatedItem)}
                 expectedClasses={expectedClasses}
-                analysts={analysts}
                 onPreview={showPreview}
                 chunk={chunk}
                 expectedScore={expectedScore}

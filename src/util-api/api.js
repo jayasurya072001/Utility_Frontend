@@ -61,7 +61,7 @@ const formDataApi = axios.create({
 
 formDataApi.interceptors.request.use(
   (config) => {
-    const token = sessionStorage.getItem('authToken');
+    const token = localStorage.getItem('authToken');
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }
@@ -219,7 +219,7 @@ export const getChunkData = async (chunk, inputMediaUrl) => {
 export const getChunks = async () => {
   try {
     const response = await privateApi.get("/utilities/analysis/get-chunks");
-    return response.data;
+    return response
   } catch (error) {
     return handleApiError(error, "Error fetching chunks");
   }
@@ -236,12 +236,25 @@ export const getModelClasses = async (model) => {
 
 export const getAllAnalysts = async () => {
   try {
-    const response = await privateApi.get(`/utilities/analysis/get-all-analysts`);
+    const response = await privateApi.get(`/utilities/analysis/get-analysts`);
     return response.data;
   } catch (error) {
     return handleApiError(error, "Error fetching all analysts");
   }
 };
+
+export const setAnalyst = async (analyst, chunk) => {
+  if(analyst && chunk) {
+    try {
+      const response = await privateApi.post('/utilities/analysis/set-analyst', {
+        analyst, chunk
+      })
+      return response
+    } catch(error) {
+      return handleApiError(error, "Error while setting analyst")
+    }
+  }
+}
 
 export const canMerge = async () => {
   try {
@@ -291,7 +304,7 @@ export const getRegressionReady = async () => {
 export const initiateRegressionTest = async (data = {}) => {
   try {
     const response = await privateApi.post('/utilities/regression-test/run', data);
-    return response.data;
+    return response;
   } catch (error) {
     return handleApiError(error, "Error initiating regression test");
   }
@@ -315,15 +328,35 @@ export const getRegressionModel = async () => {
   }
 };
 
-export const login = async (username, password) => {
+export const login = async (empid, password) => {
   try {
-    // const response = await publicApi.post("/utilities/login")
+    const body = {
+      emp_id: empid,
+      password, password
+    }
+    const response = await publicApi.post("/utilities/auth/login", body)
 
-    return { "authToken": "loggedin" };
+    console.log("Login Response", response)
+
+    const { token } = response.data
+
+    return { "authToken": token };
   } catch(error) {
     return handleApiError(error, "Cannot Log In");
   }
 };
+
+export const register = async ({ emp_id, full_name, password, privilege }) => {
+  if(emp_id && full_name && password && privilege){
+    try {
+      const body = { emp_id, full_name, password, privilege }
+
+      return await privateApi.post('/utilities/auth/register', body)
+    } catch(error) {
+      return handleApiError(error, "Cannot Register")
+    }
+  }
+}
 
 export const generateImageUrl = async (image) => {
   try {

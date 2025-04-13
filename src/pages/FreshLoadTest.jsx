@@ -39,7 +39,13 @@ const FreshLoadTest = () => {
 
     useEffect(() => {
         const init = async () => {
-            setModels(await fetchModels())
+            const response = await fetchModels()
+
+            if(response.status === 401){
+                navigate('/login')
+                return
+            }
+            setModels(response)
         }
         init()
     }, [fetchModels, setModels])
@@ -74,7 +80,7 @@ const FreshLoadTest = () => {
         
             if(response.status == 202 || response.status == 200){
                 toast.success(response.data?.message || "Process Started")
-            } else if(response?.status == 409) {
+            } else if(response?.status == 401) {
                 navigate('/login')
             } else if(response.status == 400) {
                 console.log(response.data)
@@ -85,6 +91,8 @@ const FreshLoadTest = () => {
                         toast.error(each)
                     })
                 }
+            } else if(response.status === 409) {
+                toast.error("Test Already Running")
             } else {
                 toast.error("Cannot Start Process")
             }

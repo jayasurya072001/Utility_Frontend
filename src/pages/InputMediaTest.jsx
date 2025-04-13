@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Select, Input, Button, Card, Divider, Row, Col, Typography, message, Space, Tabs, Upload } from "antd";
 import { ThunderboltOutlined, LinkOutlined, ClearOutlined, UploadOutlined } from "@ant-design/icons";
 import { fetchModels, runUrlModelTest, runFileModelTest, getAllVersions } from "../util-api/api";
+import { useNavigate } from "react-router-dom";
  
 const { Option } = Select;
 const { Title, Text } = Typography;
@@ -23,6 +24,8 @@ const InputMediaTest = () => {
   
   // File-specific state
   const [file, setFile] = useState(null);
+
+  const navigate = useNavigate()
   const allowedExtensions = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
   const maxFileSize = 5 * 1024 * 1024; // 5MB
  
@@ -31,6 +34,10 @@ const InputMediaTest = () => {
       try {
         setIsLoadingModels(true);
         const modelsData = await fetchModels();
+        if(modelsData.status === 401){
+          navigate('/login')
+          return
+        }
         setModels(modelsData);
       } catch (error) {
         message.error("Failed to load models");

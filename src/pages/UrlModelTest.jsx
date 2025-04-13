@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Select, Input, Button, Card, Divider, Row, Col, Typography, message, Space } from "antd";
 import { ThunderboltOutlined, LinkOutlined, ClearOutlined } from "@ant-design/icons";
 import { fetchModels, runUrlModelTest } from "../util-api/api";
+import { useNavigate } from "react-router-dom";
 
 const { Option } = Select;
 const { Title, Text } = Typography;
@@ -15,11 +16,17 @@ const UrlModelTest = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingModels, setIsLoadingModels] = useState(true); // Add loading state for models
 
+  const navigate = useNavigate()
+
   useEffect(() => {
     const loadModels = async () => {
       try {
         setIsLoadingModels(true);
         const modelsData = await fetchModels();
+        if(modelsData.status === 401){
+          navigate('/login')
+          return
+        }
         setModels(modelsData);
       } catch (error) {
         message.error("Failed to load models");

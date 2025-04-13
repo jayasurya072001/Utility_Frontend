@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import '../css/login-page.css'; // Reuse the same styles
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
+import { register } from '../util-api/api';
 // import { register } from '../util-api/api'; // Uncomment when your API is ready
 
 const SignupPage = () => {
@@ -11,6 +13,10 @@ const SignupPage = () => {
   const [role, setRole] = useState('user');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setError('')
+  }, [employeeId, fullName, password, confirmPassword, role, setError])
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -26,21 +32,33 @@ const SignupPage = () => {
     }
 
     const payload = {
-      employeeId,
-      fullName,
-      password,
-      role,
+      emp_id: employeeId,
+      full_name: fullName,
+      password: password,
+      privilege: role,
     };
 
     try {
       // const response = await register(payload);
-      const response = { success: true }; // Mock response for now
+      const response = await register(payload)
 
-      if (response.success) {
-        setError('');
-        navigate('/login');
-      } else {
-        setError('Registration failed. Please try again.');
+      console.log("registration result", response)
+
+      if(response.status === 201 || response.status === 200){
+        setError('')
+        toast.success(`${fullName} is registered`)
+        setTimeout(() => {
+          setEmployeeId('')
+          setFullName('')
+          setPassword('')
+          setConfirmPassword('')
+        }, 2000)
+      } else if(response.status === 409){
+        setError('User Already Exists')
+      } else if (response.status === 403){
+        toast.error("Admin Privilege Required")
+      }else {
+        setError('Cannot Register')
       }
     } catch (err) {
       setError('Something went wrong.');
