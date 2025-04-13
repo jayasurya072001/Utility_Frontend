@@ -24,7 +24,7 @@ const createApiInstance = (withAuth = false) => {
   instance.interceptors.request.use(
     (config) => {
       if (withAuth) {
-        const token = sessionStorage.getItem('authToken'); // Assuming you store your token here
+        const token = localStorage.getItem('authToken'); // Assuming you store your token here
         if (token) {
           config.headers['Authorization'] = `Bearer ${token}`;
         }
