@@ -1,0 +1,56 @@
+{
+	"info": {
+		"_postman_id": "a1d176bf-1d41-47ac-8b67-1e429d46d791",
+		"name": "Task",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "36723000",
+		"_collection_link": "https://utility-7843.postman.co/workspace/Agent_Flask_App~08f460c0-8170-4103-941b-3358b5a111a3/collection/36723000-a1d176bf-1d41-47ac-8b67-1e429d46d791?action=share&source=collection_link&creator=36723000"
+	},
+	"item": [
+		{
+			"name": "Task-URL",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"model\": \"nudity\",\n    \"version\": \"v11\",\n    \"folder_name\": \"yes_cleavage\",\n    \"maxsize\": 10,\n    \"minsize\": 5,\n    \"size\": 2,\n    \"class_type\": {\n        \"yes_cleavage\": [3.5, 4.5],\n        \"yes_bulge\": [3.5, 4.5]\n    },\n    \"prompt\": [\n        \"black female with cleaveg\"\n    ],\n    \"url\": [\n        \"https://mfwstorage1.blob.core.windows.net/mfw/useast1-media/Input/jayasuryas217@gmail.com/MEDIA/IMAGE/2025-04-15T05:14:59.920480171premium_photo-1663126328139-4d3acbdf0cbf.jpeg\"\n    ],\n    \"submitter_email\": \"jayasuryas217@gmail.com\",\n    \"submitter_phone_number\": \"+918867808005\",\n    \"agent_id\": \"1001GEC\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{url}}task/url"
+			},
+			"response": []
+		},
+		{
+			"name": "update-Task",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"taskId\": \"n1_jayasuryas217@gmail.com_v11_20250415121230\",\n  \"status\": \"COMPLETED\",\n  \"progress\": 100\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{url}}task/updateStatus"
+			},
+			"response": []
+		},
+		{
+			"name": "TaskID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "{{url}}task/n1_jayasuryas217@gmail.com_v11_20250415121230"
+			},
+			"response": []
+		}
+	]
+}

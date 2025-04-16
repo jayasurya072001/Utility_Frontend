@@ -18,6 +18,7 @@ import Chunks from "./pages/Chunks.jsx";
 import ChunkAnalysis from "./pages/ChunkAnalysis.jsx";
 import InputMediaTest from "./pages/InputMediaTest.jsx";
 import GenerateImageUrl from "./pages/GenerateImageUrl.jsx";
+import Task from "./pages/Task.jsx";
 
 const { Content } = Layout;
 
@@ -108,6 +109,7 @@ const App = () => {
             <Route path="/media-test" element={<InputMediaTest />} />
             <Route path="/generate-image-url" element={<GenerateImageUrl />} />
             <Route path="/" element={<HomePage />} />
+            <Route path="/task" element={<Task />} />
           </Routes>
         </Content>
       </Layout>

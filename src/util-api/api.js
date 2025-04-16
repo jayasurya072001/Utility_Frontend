@@ -78,7 +78,7 @@ formDataApi.interceptors.response.use(
 export const fetchModels = async () => {
   try {
     const response = await privateApi.get(`/utilities/dynamic-test/all-models`);
-    console.log(response.data);
+    console.log("Fetched models/filters", response.data);
     return response.data;
   } catch (error) {
     return handleApiError(error, "Error fetching models");
@@ -228,6 +228,7 @@ export const getChunks = async () => {
 export const getModelClasses = async (model) => {
   try {
     const response = await privateApi.get(`/utilities/analysis/get-model-classes/${model.toLowerCase()}`);
+    console.log("Classes for model", model, ":", response.data)
     return response.data;
   } catch (error) {
     return handleApiError(error, `Error fetching classes for model: ${model}`);
@@ -286,6 +287,7 @@ export const getSelectedModel = async () => {
 export const getAllVersions = async (model) => {
   try {
     const response = await privateApi.get(`/utilities/dynamic-test/all-versions/${model}`);
+    console.log("fetched versions for", model, ":", response.data)
     return response.data;
   } catch (error) {
     return handleApiError(error, `Error fetching versions for model: ${model}`);
@@ -369,3 +371,14 @@ export const generateImageUrl = async (image) => {
     return handleApiError(error, "Error Uploading Image");
   }
 };
+
+export const startTask = async (data) => {
+  try {
+    const response = await axios.post("http://54.145.248.87:5000/task/url", data)
+    console.log("Start Task Response", response)
+
+    return response
+  } catch (error) {
+    return handleApiError(error, "Error in Starting Task")
+  }
+}

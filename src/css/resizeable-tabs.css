@@ -1,0 +1,277 @@
+/* Matte Black Theme - Resizable Tabs */
+
+* {
+  color: white;
+}
+
+input::placeholder, select::placeholder, textarea::placeholder {
+  color: rgb(131, 129, 129)
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #121212;
+  color: #e0e0e0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.container {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  background-color: #121212;
+}
+
+/* Left & Right Panel Styles */
+.tab {
+  padding: 24px;
+  overflow-y: auto;
+  height: 100%;
+}
+
+.tab.left {
+  background-color: #1a1a1a;
+  border-right: 1px solid #2a2a2a;
+}
+
+.tab.right {
+  background-color: #1a1a1a;
+}
+
+/* Resizer */
+.resizer {
+  width: 6px;
+  cursor: ew-resize;
+  background-color: #2a2a2a;
+}
+.resizer:hover {
+  background-color: #444;
+}
+
+/* Dropdown */
+.dropdown-container {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.dropdown {
+  flex: 1;
+  padding: 10px;
+  background-color: #1f1f1f;
+  color: #e0e0e0;
+  border: 1px solid #333;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+/* Multi Select */
+.multi-select-container {
+  margin-bottom: 24px;
+}
+
+.ant-select-selector {
+  background-color: #1f1f1f !important;
+  color: #e0e0e0 !important;
+  border: 1px solid #333 !important;
+  border-radius: 6px !important;
+}
+
+.ant-select-dropdown {
+  background-color: #1f1f1f !important;
+}
+
+.ant-select-item-option-content {
+  color: #e0e0e0 !important;
+}
+
+/* Size Inputs */
+.size-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.size-inputs label {
+  color: #b0b0b0;
+  font-size: 14px;
+}
+
+.ant-input-number {
+  width: 100% !important;
+  background-color: #1f1f1f !important;
+  color: #e0e0e0 !important;
+  border: 1px solid #333 !important;
+}
+
+/* Prompt and URL Area */
+.text-area-container {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+textarea,
+.ant-input {
+  background-color: #1f1f1f !important;
+  color: #e0e0e0 !important;
+  border: 1px solid #333 !important;
+  resize: vertical;
+}
+
+/* Buttons */
+.ant-btn {
+  margin-top: 8px;
+  border-radius: 6px;
+  padding: 6px 14px;
+}
+
+.ant-btn-primary {
+  background-color: #3a8ee6;
+  border-color: #3a8ee6;
+}
+
+.ant-btn-primary:hover {
+  background-color: #5aa0f0;
+  border-color: #5aa0f0;
+}
+
+.ant-btn-dangerous {
+  background-color: #d83b3b;
+  border-color: #d83b3b;
+}
+
+.ant-btn-dangerous:hover {
+  background-color: #e25858;
+  border-color: #e25858;
+}
+
+/* Right Panel Selection Display */
+.selection-display {
+  background-color: #181818;
+  padding: 20px;
+  border-radius: 10px;
+  margin: 16px;
+  border: 1px solid #2a2a2a;
+}
+
+.selection-display h4 {
+  margin-bottom: 16px;
+  color: #f0f0f0;
+}
+
+.selected-class-item {
+  margin-bottom: 16px;
+  padding: 16px;
+  background-color: #1f1f1f;
+  border-radius: 8px;
+  border: 1px solid #2e2e2e;
+}
+
+.selected-class-item p {
+  margin: 0 0 8px;
+  font-weight: bold;
+}
+
+.limit-inputs {
+  display: flex;
+  gap: 20px;
+}
+
+.add-prompt-input::placeholder, .add-url-input::placeholder {
+  color: rgb(131, 129, 129)
+}
+
+.limit-input div input{  
+  color: white !important;
+}
+
+.class-select div span span {
+  color: rgb(131, 129, 129)
+}
+
+.size-inputs label div div input{
+  color: white;
+}
+
+/* Start Task CSS */
+.task-info {
+  margin-bottom: 15px;
+  padding: 10px;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+}
+
+.task-info .message {
+  font-style: italic;
+  color: #555;
+}
+
+.task-details {
+  padding-left: 20px;
+}
+
+.task-details p {
+  margin-bottom: 8px;
+}
+
+.task-details strong {
+  font-weight: bold;
+  margin-right: 5px;
+}
+
+.class-type {
+  list-style: none;
+  padding-left: 0;
+  margin-bottom: 8px;
+}
+
+.class-type > li {
+  margin-bottom: 5px;
+}
+
+.class-type ul {
+  list-style: none;
+  padding-left: 15px;
+}
+
+.prompt-list {
+  list-style: none;
+  padding-left: 0;
+  margin-bottom: 8px;
+}
+
+.prompt-list li {
+  margin-bottom: 3px;
+}
+
+.url-list {
+  list-style: none;
+  padding-left: 0;
+  margin-bottom: 8px;
+}
+
+.url-list li {
+  margin-bottom: 3px;
+}
+
+.status {
+  font-weight: bold;
+  padding: 5px 10px;
+  border-radius: 4px;
+  color: white;
+}
+
+.status.created {
+  background-color: #6c757d;
+}
+
+.status.failed {
+  background-color: #dc3545;
+}
+
+/* Add more status styles as needed */
