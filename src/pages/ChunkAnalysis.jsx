@@ -196,11 +196,8 @@ const ChunkAnalysis = () => {
             </Select>
           </div>
         )}
-        <div className="csv-buttons">
-          <Button icon={<DownloadOutlined />} onClick={handleExportPageCSV} style={{ marginRight: '10px' }}>
-            Export This Page to CSV
-          </Button>
-          <Button icon={<DownloadOutlined />} onClick={handleExportFullCSV}>
+        <div>
+          <Button type="primary" icon={<DownloadOutlined />} onClick={handleExportFullCSV}>
             Export This Chunk to CSV
           </Button>
         </div>

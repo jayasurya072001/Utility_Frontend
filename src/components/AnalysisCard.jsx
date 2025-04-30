@@ -21,6 +21,7 @@ const AnalysisCard = ({ data, onUpdate, expectedClasses, onPreview, chunk, expec
     const [parsedPredictedClasses, setParsedPredictedClasses] = useState({})
     const [selectedButton, setSelectedButton] = useState('')
     const [bugDropDown, setBugDropDown] = useState(false)
+    const [bugDescription, setBugDescription] = useState('')
 
     useEffect(() => {
       if(selectedButton !== 'Bug'){
@@ -198,8 +199,8 @@ const AnalysisCard = ({ data, onUpdate, expectedClasses, onPreview, chunk, expec
             }}
           />
           <div className="image-actions">
-            <Button icon={<ExpandOutlined />} onClick={() => onPreview(data["inputMediaUrl"])} />
-            <Button icon={<LinkOutlined />} onClick={copyImageUrl} />
+            <Button type="primary" icon={<ExpandOutlined />} onClick={() => onPreview(data["inputMediaUrl"])} />
+            <Button type="primary" icon={<LinkOutlined />} onClick={copyImageUrl} />
           </div>
         </div>
   
@@ -283,6 +284,18 @@ const AnalysisCard = ({ data, onUpdate, expectedClasses, onPreview, chunk, expec
                   placeholder="Enter URLs"
                   value={reproducedUrls}
                   onChange={handleReproducedUrlChange}
+                  style={{ width: "100%" }}
+                />
+              </div>
+
+              {/* New Bug Description TextArea */}
+              <div className="form-group">
+                <label>Bug Description</label>
+                <TextArea
+                  rows={3}
+                  placeholder="Describe the bug..."
+                  value={bugDescription}
+                  onChange={(e) => setBugDescription(e.target.value)}
                   style={{ width: "100%" }}
                 />
               </div>
