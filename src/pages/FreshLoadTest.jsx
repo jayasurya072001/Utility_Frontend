@@ -42,7 +42,7 @@ const FreshLoadTest = () => {
             const response = await fetchModels()
 
             if(response.status === 401){
-                navigate('/login')
+                navigate('/')
                 return
             }
             setModels(response)
@@ -81,7 +81,7 @@ const FreshLoadTest = () => {
             if(response.status == 202 || response.status == 200){
                 toast.success(response.data?.message || "Process Started")
             } else if(response?.status == 401) {
-                navigate('/login')
+                navigate('/')
             } else if(response.status == 400) {
                 console.log(response.data)
                 toast.error(response.data.message)

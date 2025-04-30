@@ -35,7 +35,7 @@ const GenerateImageUrl = () => {
                 setImageUrl(response.url); // Axios puts the response data in 'response.data'
                 setCopySuccess('');
             } else if (response?.status == 401) {
-                navigate('/login')
+                navigate('/')
             } else {
                 console.error('Image upload failed:', response.statusText || response.status);
                 alert('Image upload failed. Please try again.');

@@ -79,13 +79,17 @@ const App = () => {
   //     navigate("/adminlogin");
   //   }
   // }, [location.pathname, isAdmin, navigate, loading]);
+  
+  const noSidebarRoutes = ["/login", "/task", "/"];
+
+  const isSidebarVisible = !noSidebarRoutes.includes(location.pathname);
 
   return (
 
     loading ? <h1>Loading</h1>
     : <Layout style={{ minHeight: "100vh" }}>
       <Toaster />
-      {!isAuthPage && <Sidebar />}
+      {isSidebarVisible && <Sidebar />}
       <Layout style={{ background: "#111" }}>
         <Content 
           style={{ 
@@ -98,7 +102,7 @@ const App = () => {
           }}
         >
           <Routes>
-            <Route path="/login" element={<LoginPage />} />
+            <Route path="/" element={<LoginPage />} />
             <Route path="/adminlogin" element={<AdminLoginPage />} />
             <Route path="/register" element={<SignupPage />} />
             <Route path="/fresh-load" element={<FreshLoadTest />} />
@@ -108,7 +112,7 @@ const App = () => {
             <Route path="/regression-load" element={<RegressionLoadTest />} />
             <Route path="/media-test" element={<InputMediaTest />} />
             <Route path="/generate-image-url" element={<GenerateImageUrl />} />
-            <Route path="/" element={<HomePage />} />
+            <Route path="/home" element={<HomePage />} />
             <Route path="/task" element={<Task />} />
           </Routes>
         </Content>

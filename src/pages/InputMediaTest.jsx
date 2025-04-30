@@ -35,7 +35,7 @@ const InputMediaTest = () => {
         setIsLoadingModels(true);
         const modelsData = await fetchModels();
         if(modelsData.status === 401){
-          navigate('/login')
+          navigate('/')
           return
         }
         setModels(modelsData);

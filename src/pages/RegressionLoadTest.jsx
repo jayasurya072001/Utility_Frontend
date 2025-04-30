@@ -117,7 +117,7 @@ const RegressionLoadTest = () => {
           const response = await fetchModels()
 
           if(response.status === 401){
-            navigate("/login")
+            navigate("/")
           }
           setModels(response)
       }
@@ -133,7 +133,8 @@ const RegressionLoadTest = () => {
         console.log("All Versions", allVersion)
         console.log("nrv", noRegressionVersion)
 
-        setModelVersions(Array.from(new Set(allVersion)).filter(x => x !== noRegressionVersion))
+        // setModelVersions(Array.from(new Set(allVersion)).filter(x => x === noRegressionVersion))
+        setModelVersions(Array.from(new Set(allVersion)))
     }
 
     selectedModel && init()

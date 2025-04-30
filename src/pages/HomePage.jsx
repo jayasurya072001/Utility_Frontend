@@ -1,50 +1,51 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import { Layout, Card, Row, Col, Typography } from "antd";
-import { FileText, BarChart, Repeat, Link as LinkIcon, Zap, Cpu, Database, TestTube2 } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Layout, Card, Row, Col, Typography, Button, Dropdown, Menu } from "antd";
+import { LogoutOutlined, UserOutlined } from '@ant-design/icons';
+import { FileText, BarChart, Repeat, Link as LinkIcon, Zap, Cpu, Database, TestTube2, LogOut } from "lucide-react";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
 
 const quickLinks = [
-  { 
-    key: "fresh-load", 
-    label: "Fresh Load Test", 
+  {
+    key: "fresh-load",
+    label: "Fresh Load Test",
     icon: <FileText size={24} />,
     description: "Perform initial load testing for new models",
     gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
   },
-  { 
-    key: "analysis-verification", 
-    label: "Analysis Validation", 
+  {
+    key: "analysis-verification",
+    label: "Analysis Validation",
     icon: <BarChart size={24} />,
     description: "Validate model analysis results",
     gradient: "linear-gradient(135deg, #11998e 0%, #38ef7d 100%)"
   },
-  { 
-    key: "regression-load", 
-    label: "Regression Load Test", 
+  {
+    key: "regression-load",
+    label: "Regression Load Test",
     icon: <Repeat size={24} />,
     description: "Run comparative regression tests",
     gradient: "linear-gradient(135deg, #f46b45 0%, #eea849 100%)"
   },
-  { 
-    key: "urlmodel-test", 
-    label: "URL Model Test", 
+  {
+    key: "urlmodel-test",
+    label: "URL Model Test",
     icon: <LinkIcon size={24} />,
     description: "Test models with URL inputs",
     gradient: "linear-gradient(135deg, #4776E6 0%, #8E54E9 100%)"
   },
-  { 
-    key: "image-model-test", 
-    label: "Image Model Test", 
+  {
+    key: "image-model-test",
+    label: "Image Model Test",
     icon: <Cpu size={24} />,
     description: "Test models with image uploads",
     gradient: "linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%)"
   },
-  { 
-    key: "performance-test", 
-    label: "Performance Metrics", 
+  {
+    key: "performance-test",
+    label: "Performance Metrics",
     icon: <Zap size={24} />,
     description: "View system performance analytics",
     gradient: "linear-gradient(135deg, #43C6AC 0%, #191654 100%)"
@@ -52,25 +53,56 @@ const quickLinks = [
 ];
 
 const HomePage = () => {
+
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    // Remove the auth token from localStorage
+    localStorage.removeItem('authToken');
+    // Optionally remove other user data
+    localStorage.removeItem('userRole');
+    // Redirect to login page
+    navigate('/');
+  };
+
   return (
     <Layout style={{
       minHeight: '90vh',
       background: '#111',
       padding: '24px'
     }}>
+      {/* Add header with logout button */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'flex-end',
+        marginBottom: '24px'
+      }}>
+        <Button
+          type="text"
+          icon={<LogOut />}
+          onClick={handleLogout}
+          style={{
+            color: '#ffffff',
+            fontSize: '16px'
+          }}
+        >
+          Logout
+        </Button>
+      </div>
+
       <Content>
-        <div style={{ 
+        <div style={{
           marginBottom: '32px',
           textAlign: 'center'
         }}>
-          <Title level={2} style={{ 
+          <Title level={2} style={{
             color: '#ffffff',
             marginBottom: '8px',
             fontWeight: 600
           }}>
             Welcome to Utility Tools
           </Title>
-          <Text style={{ 
+          <Text style={{
             color: '#aaaaaa',
             fontSize: '16px'
           }}>
@@ -80,12 +112,12 @@ const HomePage = () => {
 
         <Row gutter={[24, 24]} justify="center">
           {quickLinks.map((item) => (
-            <Col 
-              xs={24} 
-              sm={12} 
-              md={8} 
-              lg={8} 
-              xl={8} 
+            <Col
+              xs={24}
+              sm={12}
+              md={8}
+              lg={8}
+              xl={8}
               key={item.key}
               style={{ display: 'flex', justifyContent: 'center' }}
             >
@@ -128,19 +160,19 @@ const HomePage = () => {
                     background: '#252525',
                     boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)'
                   }}>
-                    {React.cloneElement(item.icon, { 
-                      style: { 
-                        color: '#1890ff' 
-                      } 
+                    {React.cloneElement(item.icon, {
+                      style: {
+                        color: '#1890ff'
+                      }
                     })}
                   </div>
-                  <Title level={4} style={{ 
+                  <Title level={4} style={{
                     color: '#ffffff',
                     marginBottom: '8px'
                   }}>
                     {item.label}
                   </Title>
-                  <Text style={{ 
+                  <Text style={{
                     color: '#888888',
                     fontSize: '14px'
                   }}>

@@ -1,144 +1,239 @@
-import React, { useEffect, useState } from 'react';
-import '../css/login-page.css'; // Reuse the same styles
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { register } from '../util-api/api';
-// import { register } from '../util-api/api'; // Uncomment when your API is ready
+import '../css/signup-page.css'
+import { FiUser, FiLock, FiCreditCard, FiCheck, FiX } from 'react-icons/fi';
 
 const SignupPage = () => {
-  const [employeeId, setEmployeeId] = useState('');
-  const [fullName, setFullName] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [role, setRole] = useState('user');
-  const [error, setError] = useState('');
+  const [formData, setFormData] = useState({
+    employeeId: '',
+    fullName: '',
+    password: '',
+    confirmPassword: '',
+    role: 'user'
+  });
+  const [errors, setErrors] = useState({});
+  const [passwordStrength, setPasswordStrength] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    setError('')
-  }, [employeeId, fullName, password, confirmPassword, role, setError])
+    // Password strength calculation
+    if (formData.password) {
+      let strength = 0;
+      if (formData.password.length >= 8) strength += 1;
+      if (/[A-Z]/.test(formData.password)) strength += 1;
+      if (/[0-9]/.test(formData.password)) strength += 1;
+      if (/[^A-Za-z0-9]/.test(formData.password)) strength += 1;
+      setPasswordStrength(strength);
+    } else {
+      setPasswordStrength(0);
+    }
+  }, [formData.password]);
 
-  const handleSignup = async (e) => {
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    
+    // Clear error when user types
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
+
+  const validate = () => {
+    const newErrors = {};
+    
+    if (!formData.employeeId.trim()) newErrors.employeeId = 'Employee ID is required';
+    if (!formData.fullName.trim()) newErrors.fullName = 'Full name is required';
+    if (!formData.password) newErrors.password = 'Password is required';
+    if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
+    }
+    if (formData.password.length < 8) {
+      newErrors.password = 'Password must be at least 8 characters';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!employeeId || !fullName || !password || !confirmPassword) {
-      setError('All fields are required.');
+    setIsSubmitting(true);
+    
+    if (!validate()) {
+      setIsSubmitting(false);
       return;
     }
-
-    if (password !== confirmPassword) {
-      setError('Passwords do not match.');
-      return;
-    }
-
-    const payload = {
-      emp_id: employeeId,
-      full_name: fullName,
-      password: password,
-      privilege: role,
-    };
 
     try {
-      // const response = await register(payload);
-      const response = await register(payload)
+      const payload = {
+        emp_id: formData.employeeId,
+        full_name: formData.fullName,
+        password: formData.password,
+        privilege: formData.role,
+      };
 
-      console.log("registration result", response)
+      const response = await register(payload);
 
-      if(response.status === 201 || response.status === 200){
-        setError('')
-        toast.success(`${fullName} is registered`)
-        setTimeout(() => {
-          setEmployeeId('')
-          setFullName('')
-          setPassword('')
-          setConfirmPassword('')
-        }, 2000)
-      } else if(response.status === 409){
-        setError('User Already Exists')
-      } else if (response.status === 403){
-        toast.error("Admin Privilege Required")
-      }else {
-        setError('Cannot Register')
+      if (response.status === 201 || response.status === 200) {
+        toast.success(`${formData.fullName} registered successfully!`, {
+          style: {
+            background: '#333',
+            color: '#fff',
+            border: '1px solid #444'
+          }
+        });
+        setFormData({
+          employeeId: '',
+          fullName: '',
+          password: '',
+          confirmPassword: '',
+          role: 'user'
+        });
+      } else if (response.status === 409) {
+        setErrors({ employeeId: 'User already exists' });
+      } else if (response.status === 403) {
+        toast.error("Admin privilege required", {
+          style: {
+            background: '#333',
+            color: '#fff',
+            border: '1px solid #444'
+          }
+        });
+      } else {
+        toast.error("Registration failed", {
+          style: {
+            background: '#333',
+            color: '#fff',
+            border: '1px solid #444'
+          }
+        });
       }
     } catch (err) {
-      setError('Something went wrong.');
+      toast.error("An error occurred. Please try again.", {
+        style: {
+          background: '#333',
+          color: '#fff',
+          border: '1px solid #444'
+        }
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="login-page-container">
-      <div className="login-form">
-        <h2 className="login-title">Register</h2>
-        <form onSubmit={handleSignup}>
-          <div className="input-group">
-            <label htmlFor="employeeId">Employee ID</label>
+    <div className="dark-theme-container">
+      <div className="dark-signup-card">
+        <div className="signup-header">
+          <h2>Create Account</h2>
+        </div>
+
+        <form onSubmit={handleSubmit} className="signup-form">
+          <div className={`input-group ${errors.employeeId ? 'error' : ''}`}>
+            <div className="input-icon">
+              <FiCreditCard />
+            </div>
             <input
               type="text"
-              id="employeeId"
-              value={employeeId}
-              onChange={(e) => setEmployeeId(e.target.value)}
-              required
+              name="employeeId"
+              placeholder="Employee ID"
+              value={formData.employeeId}
+              onChange={handleChange}
+              className="dark-input"
             />
+            {errors.employeeId && <span className="error-message">{errors.employeeId}</span>}
           </div>
-          <div className="input-group">
-            <label htmlFor="fullName">Full Name</label>
+
+          <div className={`input-group ${errors.fullName ? 'error' : ''}`}>
+            <div className="input-icon">
+              <FiUser />
+            </div>
             <input
               type="text"
-              id="fullName"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              required
+              name="fullName"
+              placeholder="Full Name"
+              value={formData.fullName}
+              onChange={handleChange}
+              className="dark-input"
             />
+            {errors.fullName && <span className="error-message">{errors.fullName}</span>}
           </div>
-          <div className="input-group">
-            <label htmlFor="password">Password</label>
+
+          <div className={`input-group ${errors.password ? 'error' : ''}`}>
+            <div className="input-icon">
+              <FiLock />
+            </div>
             <input
               type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
+              name="password"
+              placeholder="Password"
+              value={formData.password}
+              onChange={handleChange}
+              className="dark-input"
             />
+            {formData.password && (
+              <div className="password-strength">
+                <div className={`strength-bar ${passwordStrength > 0 ? 'active' : ''}`}></div>
+                <div className={`strength-bar ${passwordStrength > 1 ? 'active' : ''}`}></div>
+                <div className={`strength-bar ${passwordStrength > 2 ? 'active' : ''}`}></div>
+                <div className={`strength-bar ${passwordStrength > 3 ? 'active' : ''}`}></div>
+              </div>
+            )}
+            {errors.password && <span className="error-message">{errors.password}</span>}
           </div>
-          <div className="input-group">
-            <label htmlFor="confirmPassword">Confirm Password</label>
+
+          <div className={`input-group ${errors.confirmPassword ? 'error' : ''}`}>
+            <div className="input-icon">
+              <FiLock />
+            </div>
             <input
               type="password"
-              id="confirmPassword"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
+              name="confirmPassword"
+              placeholder="Confirm Password"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              className="dark-input"
             />
+            {errors.confirmPassword && (
+              <span className="error-message">{errors.confirmPassword}</span>
+            )}
           </div>
-          <div className="input-group">
-            <label>Role</label>
-            <div style={{ display: 'flex', gap: '1rem' }}>
-              <label>
-                <input
-                  type="radio"
-                  name="role"
-                  value="user"
-                  checked={role === 'user'}
-                  onChange={() => setRole('user')}
-                /> User
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  name="role"
-                  value="admin"
-                  checked={role === 'admin'}
-                  onChange={() => setRole('admin')}
-                /> Admin
-              </label>
+
+          <div className="role-selection">
+            <label>Account Type</label>
+            <div className="role-options">
+              <button
+                type="button"
+                className={`role-btn ${formData.role === 'user' ? 'active' : ''}`}
+                onClick={() => setFormData({ ...formData, role: 'user' })}
+              >
+                <FiUser /> User
+              </button>
+              <button
+                type="button"
+                className={`role-btn ${formData.role === 'admin' ? 'active' : ''}`}
+                onClick={() => setFormData({ ...formData, role: 'admin' })}
+              >
+                <FiUser /> Admin
+              </button>
             </div>
           </div>
-          {error && <p className="error-message">{error}</p>}
-          <button type="submit" className="login-button">Register</button>
+
+          <button
+            type="submit"
+            className="signup-btn"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Creating Account...' : 'Create Account'}
+          </button>
         </form>
-        <p className="link-text">
-          Already have an account? <a href="/login">Log In</a>
-        </p>
       </div>
     </div>
   );

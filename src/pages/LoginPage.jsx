@@ -1,63 +1,133 @@
 import React, { useState } from 'react';
-import '../css/login-page.css'
-import { login } from '../util-api/api';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
+import { login } from '../util-api/api';
+import '../css/login-page.css'
+import { FiUser, FiLock, FiLogIn } from 'react-icons/fi';
 
 const LoginPage = () => {
-  const [empid, setEmpid] = useState('');
-  const [password, setPassword] = useState('');
+  const [credentials, setCredentials] = useState({
+    empid: '',
+    password: ''
+  });
   const [error, setError] = useState('');
-  const navigate = useNavigate()
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setCredentials(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    setError('');
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    // In a real application, you would send these credentials to your backend
-    if (empid && password) {
-      const response = await login(empid, password)
-      if(response?.authToken){
-        window.localStorage.setItem("authToken", response.authToken)
-        navigate('/')
-        setError('');
+    setIsLoading(true);
+    
+    if (!credentials.empid || !credentials.password) {
+      setError('Both fields are required');
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const response = await login(credentials.empid, credentials.password);
+      
+      if (response?.authToken) {
+        window.localStorage.setItem("authToken", response.authToken);
+        toast.success('Login successful!', {
+          style: {
+            background: '#333',
+            color: '#fff',
+            border: '1px solid #444'
+          }
+        });
+        navigate('/home');
       } else {
-        setError('Could Not Log In');
+        setError('Invalid credentials');
+        toast.error('Could not log in', {
+          style: {
+            background: '#333',
+            color: '#fff',
+            border: '1px solid #444'
+          }
+        });
       }
-      // Redirect to your main application page here
-    } else {
-      setError('Invalid employee id or password.');
+    } catch (err) {
+      setError('An error occurred. Please try again.');
+      toast.error('Login failed', {
+        style: {
+          background: '#333',
+          color: '#fff',
+          border: '1px solid #444'
+        }
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="login-page-container">
-      <div className="login-form">
-        <h2 className="login-title">Login</h2>
-        <form onSubmit={handleLogin}>
-          <div className="input-group">
-            <label htmlFor="empid">Employee ID</label>
+    <div className="dark-theme-container">
+      <div className="dark-login-card">
+        <div className="login-header">
+          <h2>Welcome Back</h2>
+          <p>Sign in to access your account</p>
+        </div>
+
+        <form onSubmit={handleLogin} className="login-form">
+          <div className={`input-group ${error ? 'error' : ''}`}>
+            <div className="input-icon">
+              <FiUser />
+            </div>
             <input
               type="text"
-              id="empid"
-              value={empid}
-              onChange={(e) => setEmpid(e.target.value)}
-              required
+              name="empid"
+              placeholder="Employee ID"
+              value={credentials.empid}
+              onChange={handleChange}
+              className="dark-input"
+              autoFocus
             />
           </div>
-          <div className="input-group">
-            <label htmlFor="password">Password</label>
+
+          <div className={`input-group ${error ? 'error' : ''}`}>
+            <div className="input-icon">
+              <FiLock />
+            </div>
             <input
               type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
+              name="password"
+              placeholder="Password"
+              value={credentials.password}
+              onChange={handleChange}
+              className="dark-input"
             />
           </div>
-          {error && <p className="error-message">{error}</p>}
-          <button type="submit" className="login-button">Log In</button>
+
+          {error && <div className="error-message">{error}</div>}
+
+          <button
+            type="submit"
+            className="login-btn"
+            disabled={isLoading}
+          >
+            <FiLogIn className="btn-icon" />
+            {isLoading ? 'Signing In...' : 'Sign In'}
+          </button>
         </form>
-        <p className="link-text">
-          Don't have an account? <a href="/register">Register</a>
-        </p>
+
+        <div className="login-footer">
+          <p>
+            Don't have an account?{' '}
+            <a href="/register" className="register-link">
+              Create one
+            </a>
+          </p>
+        </div>
       </div>
     </div>
   );

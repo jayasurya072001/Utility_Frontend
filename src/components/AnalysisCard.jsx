@@ -204,8 +204,8 @@ const AnalysisCard = ({ data, onUpdate, expectedClasses, onPreview, chunk, expec
         </div>
   
         <div className="card-info">
-          <p><span>Result:</span> {data["Result"] || "-"}</p>
-          <p><span>Projection:</span> {data["Projection Layer"] || "-"}</p>
+          {/* <p><span>Result:</span> {data["Result"] || "-"}</p>
+          <p><span>Projection:</span> {data["Projection Layer"] || "-"}</p> */}
           <p><span>Detection:</span> {data["Detection Layer"] || "-"}</p>
           <div className="predictions">
             <span>Prediction:</span>

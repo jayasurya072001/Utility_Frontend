@@ -74,7 +74,7 @@ const Chunks = () => {
       try {
         const response = await getChunks();
         if(response.status === 401){
-          navigate('/login')
+          navigate('/')
         }
         if(response?.data){
           setChunks(response.data)

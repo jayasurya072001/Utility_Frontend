@@ -11,28 +11,51 @@ import {
   Activity,
   Server,
   Cpu,
-  Settings
+  Settings,
+  UserPlus,
+  icons
 } from "lucide-react"
 import "../styles.css"
+import { useEffect, useState } from 'react';
+
 const { Sider } = Layout;
 const { SubMenu } = Menu;
 
-const menuItems = [
-  { key: "fresh-load", label: "Fresh Load Test", icon: <FileText /> },
-  { key: "analysis", label: "Analysis", icon: <Settings />},
-  // { key: "analysis-verification", label: "Analysis Validation", icon: <BarChart /> },
-  { key: "regression-load", label: "Regression Load Test", icon: <Repeat /> },
-  { key: "media-test", label: "Input Media Test", icon: <LinkIcon /> },
-  { key: "generate-image-url", label: "Generate Image Url", icon: <Image /> },
-  { key: "models-running", label: "Models Running Status", icon: <Cpu /> },
-  { key: "models-training", label: "Models Training Status", icon: <Activity /> },
+const Sidebar = () => {
+  const [userRole, setUserRole] = useState('user'); // Default to user
   
-];
+  useEffect(() => {
+    // Get user role from localStorage or token when component mounts
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      try {
+        // Simple token parsing - consider using jwt-decode in production
+        const tokenData = JSON.parse(atob(token.split('.')[1]));
+        setUserRole(tokenData.privilege || 'user');
+      } catch (error) {
+        console.error('Error parsing token:', error);
+      }
+    }
+  }, []);
 
-const Sidebar = () => (
-  <Sider width={250} style={{ background: "#000", color: "#fff" }}>
+  const menuItems = [
+    { key: "fresh-load", label: "Fresh Load Test", icon: <FileText /> },
+    { key: "analysis", label: "Analysis", icon: <Settings />},
+    { key: "regression-load", label: "Regression Load Test", icon: <Repeat /> },
+    { key: "media-test", label: "Input Media Test", icon: <LinkIcon /> },
+    { key: "generate-image-url", label: "Generate Image Url", icon: <Image /> },
+    { key: "models-running", label: "Models Running Status", icon: <Cpu /> },
+    { key: "models-training", label: "Models Training Status", icon: <Activity /> },
+    // Only include register item if user is admin
+    ...(userRole === 'admin' ? [
+      { key: "register", label: "Create Users", icon: <UserPlus /> }
+    ] : [])
+  ];
+
+  return (
+    <Sider width={250} style={{ background: "#000", color: "#fff" }}>
     <div className="logo">
-      <Link to="/" style={{ color: "#fff", textDecoration: "none" }}>Utility Tools</Link>
+      <Link to="/home" style={{ color: "#fff", textDecoration: "none" }}>Utility Tools</Link>
     </div>
     <Menu theme="dark" mode="inline" style={{ background: "#000" }}>
       {menuItems.map((item) => (
@@ -54,6 +77,8 @@ const Sidebar = () => (
       </SubMenu>
     </Menu>
   </Sider>
-);
+  )
+
+}
 
 export default Sidebar;
