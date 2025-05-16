@@ -1,237 +1,558 @@
 /* styles.css */
 body {
-    background-color: #000;
-    color: #fff;
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
+  background-color: #000;
+  color: #fff;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
 }
 
 .logo {
-    color: #fff;
-    font-size: 20px;
-    font-weight: bold;
-    text-align: center;
-    padding: 20px;
+  color: #fff;
+  font-size: 20px;
+  font-weight: bold;
+  text-align: center;
+  padding: 20px;
 }
 
 .ant-layout-sider {
-    border-right: 1px solid #333;
+  border-right: 1px solid #333;
+  transition: all 0.2s !important;
 }
 
 .ant-menu-dark {
-    background: #000 !important;
-    border-right: none;
+  background: #000 !important;
+  border-right: none;
 }
 
 .ant-menu-dark .ant-menu-item {
-    color: #aaa;
+  color: #aaa;
 }
 
 .ant-menu-dark .ant-menu-item-selected {
-    background-color: #222 !important;
-    color: #fff !important;
+  background-color: #222 !important;
+  color: #fff !important;
 }
 
 .ant-layout-header {
-    font-size: 18px;
-    font-weight: bold;
-    text-align: center;
-    border-bottom: 1px solid #333;
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+  border-bottom: 1px solid #333;
 }
 
 h1 {
-    font-size: 24px;
+  font-size: 24px;
 }
 
 /* Change submenu background color to black */
 .ant-menu-sub {
-    background-color: #000 !important;
+  background-color: #000 !important;
 }
 
 /* Ensure submenu items also have a black background */
 .ant-menu-item {
-    background-color: #000 !important;
-    color: #fff !important;
+  background-color: #000 !important;
+  color: #fff !important;
 }
 
 /* Change submenu hover effect */
 .ant-menu-item:hover {
-    background-color: #111 !important;
+  background-color: #111 !important;
 }
 
 /* Main container */
 .dark-app-container {
-    max-width: 800px;
-    margin: 0 250px;
-    padding: 20px;
+  max-width: 800px;
+  margin: 20px 350px;
+  padding: 20px;
 }
 
 /* Card styling */
 .dark-form-card {
-    background: #111111;
-    border-radius: 8px;
-    padding: 30px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-    border: 1px solid #333;
+  background: #111111;
+  border-radius: 8px;
+  padding: 30px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  border: 1px solid #333;
 }
 
 .dark-form-title {
-    color: #e0e0e0;
-    font-size: 22px;
-    margin-bottom: 25px;
-    font-weight: 600;
-    text-align: center;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
+  color: #e0e0e0;
+  font-size: 22px;
+  margin-bottom: 25px;
+  font-weight: 600;
+  text-align: center;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 .dark-form-content {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 /* Input group styling */
 .dark-input-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .dark-input-label {
-    color: #aaa;
-    font-size: 13px;
-    font-weight: 500;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
+  color: #aaa;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 .dark-input-hint {
-    color: #555;
-    font-size: 11px;
-    margin-top: -10px;
-    margin-bottom: 5px;
-    font-style: italic;
+  color: #555;
+  font-size: 11px;
+  margin-top: -10px;
+  margin-bottom: 5px;
+  font-style: italic;
 }
 
 /* Select input styling */
 .dark-styled-select .ant-select-selector {
-    background: #1a1a1a !important;
-    border: 1px solid #333 !important;
-    color: #e0e0e0 !important;
-    height: 42px !important;
-    border-radius: 4px !important;
-    padding: 0 12px !important;
+  background: #1a1a1a !important;
+  border: 1px solid #333 !important;
+  color: #e0e0e0 !important;
+  height: 42px !important;
+  border-radius: 4px !important;
+  padding: 0 12px !important;
 }
 
 .dark-styled-select .ant-select-selection-placeholder {
-    color: #555 !important;
+  color: #555 !important;
 }
 
 .dark-styled-select:hover .ant-select-selector {
-    border-color: #444 !important;
+  border-color: #444 !important;
 }
 
 .dark-styled-select:focus-within .ant-select-selector {
-    border-color: #666 !important;
-    box-shadow: 0 0 0 2px rgba(100, 100, 100, 0.2) !important;
+  border-color: #666 !important;
+  box-shadow: 0 0 0 2px rgba(100, 100, 100, 0.2) !important;
 }
 
 .dark-dropdown-icon {
-    color: #666 !important;
-    font-size: 12px;
+  color: #666 !important;
+  font-size: 12px;
 }
 
 /* Dropdown menu */
 .dark-dropdown-menu {
-    background: #1a1a1a !important;
-    border: 1px solid #333 !important;
-    border-radius: 4px !important;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5) !important;
-    padding: 5px 0 !important;
+  background: #1a1a1a !important;
+  border: 1px solid #333 !important;
+  border-radius: 4px !important;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5) !important;
+  padding: 5px 0 !important;
 }
 
 .dark-dropdown-menu .ant-select-item {
-    color: #e0e0e0 !important;
-    padding: 10px 16px !important;
+  color: #e0e0e0 !important;
+  padding: 10px 16px !important;
 }
 
 .dark-dropdown-menu .ant-select-item:hover {
-    background: #222 !important;
+  background: #222 !important;
 }
 
 .dark-dropdown-menu .ant-select-item-option-selected {
-    background: #252525 !important;
-    color: #fff !important;
-    font-weight: 500;
+  background: #252525 !important;
+  color: #fff !important;
+  font-weight: 500;
 }
 
 .dark-option-content {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .dark-option-icon {
-    color: #666;
-    font-size: 13px;
+  color: #666;
+  font-size: 13px;
 }
 
 /* Textarea styling */
 .dark-styled-textarea {
-    background: #1a1a1a !important;
-    border: 1px solid #333 !important;
-    color: #e0e0e0 !important;
-    border-radius: 4px !important;
-    padding: 12px !important;
-    resize: vertical;
+  background: #1a1a1a !important;
+  border: 1px solid #333 !important;
+  color: #e0e0e0 !important;
+  border-radius: 4px !important;
+  padding: 12px !important;
+  resize: vertical;
 }
 
 .dark-styled-textarea:hover {
-    border-color: #444 !important;
+  border-color: #444 !important;
 }
 
 .dark-styled-textarea:focus {
-    border-color: #666 !important;
-    box-shadow: 0 0 0 2px rgba(100, 100, 100, 0.2) !important;
+  border-color: #666 !important;
+  box-shadow: 0 0 0 2px rgba(100, 100, 100, 0.2) !important;
 }
 
 /* Button styling */
 .dark-submit-btn {
-    background: #1890ff !important;
-    border: 1px solid #444 !important;
-    height: 44px !important;
-    font-size: 14px !important;
-    font-weight: 500 !important;
-    border-radius: 4px !important;
-    margin-top: 10px !important;
-    color: #e0e0e0 !important;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    transition: all 0.2s ease !important;
+  background: #1890ff !important;
+  border: 1px solid #444 !important;
+  height: 44px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  border-radius: 4px !important;
+  margin-top: 10px !important;
+  color: #e0e0e0 !important;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.2s ease !important;
 }
 
 .dark-submit-btn:hover {
-    background: #1890ff !important;
-    border-color: #555 !important;
-    color: #fff !important;
+  background: #1890ff !important;
+  border-color: #555 !important;
+  color: #fff !important;
 }
 
 .dark-submit-btn:active {
-    background: #2a2a2a !important;
+  background: #2a2a2a !important;
 }
 
 .dark-submit-btn .anticon {
-    color: #999 !important;
+  color: #999 !important;
 }
-  
+
 .placeholder-white::placeholder {
-    color: white;
-    opacity: 1;
+  color: white;
+  opacity: 1;
 }
-  
+
+/* Add these styles for the collapsible sidebar */
+.ant-layout-sider-collapsed .logo {
+  padding: 20px 0 !important;
+}
+
+.ant-layout-sider-collapsed .ant-menu-item {
+  padding: 0 24px !important;
+}
+
+/* Tooltip styles for collapsed menu items */
+.ant-tooltip {
+  max-width: 200px;
+}
+
+.ant-tooltip-inner {
+  background-color: #1a1a1a;
+  border: 1px solid #333;
+  color: #fff;
+}
+
+/* Toggle button hover effect */
+.sidebar-toggle-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Fix for submenu in collapsed state */
+.ant-menu-inline-collapsed .ant-menu-submenu-title {
+  padding: 0 24px !important;
+}
+
+/* Ensure content adjusts smoothly */
+.ant-layout {
+  transition: margin-left 0.2s;
+  background: #111 !important;
+}
+
+/* Fix for the main content area */
+.ant-layout-content {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Ensure the sidebar doesn't create gaps */
+.custom-sidebar {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Ensure the layout adjusts properly when sidebar is collapsed */
+.ant-layout-has-sider {
+  overflow-x: hidden;
+}
+
+/* Fix for sidebar background color */
+.custom-sidebar {
+  background-color: #000 !important;
+}
+
+.custom-sidebar .ant-layout-sider-children {
+  background-color: #000 !important;
+}
+
+.ant-layout-sider-collapsed {
+  background-color: #000 !important;
+}
+
+/* Ensure menu background stays black */
+.ant-menu-dark {
+  background: #000 !important;
+}
+
+.ant-menu-dark.ant-menu-inline-collapsed {
+  background: #000 !important;
+}
+
+/* Fix for menu items in collapsed state */
+.ant-menu-inline-collapsed > .ant-menu-item,
+.ant-menu-inline-collapsed > .ant-menu-submenu > .ant-menu-submenu-title {
+  padding: 0 calc(50% - 16px / 2) !important;
+  background-color: #000 !important;
+}
+
+/* Fix for submenu popup background */
+.ant-menu-dark .ant-menu-submenu-popup {
+  background: #000 !important;
+}
+
+.ant-menu-submenu-popup.ant-menu-dark .ant-menu-item-selected {
+  background-color: #222 !important;
+}
+
+/* Ensure the toggle button has the right background */
+.sidebar-toggle-btn {
+  background-color: transparent !important;
+}
+
+.sidebar-toggle-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Custom sidebar menu */
+.custom-sidebar-menu {
+  background-color: #000 !important;
+}
+
+.custom-sidebar-menu .ant-menu-item {
+  background-color: #000 !important;
+}
+
+.custom-sidebar-menu .ant-menu-submenu {
+  background-color: #000 !important;
+}
+
+.custom-sidebar-menu .ant-menu-submenu-title {
+  background-color: #000 !important;
+}
+
+/* Fix for hover states */
+.custom-sidebar-menu .ant-menu-item:hover {
+  background-color: #222 !important;
+}
+
+.custom-sidebar-menu .ant-menu-submenu-title:hover {
+  background-color: #222 !important;
+}
+
+/* Fix for unwanted margins and paddings */
+.ant-layout-content {
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+}
+
+/* The previous rule has been removed as it's not supported in CSS */
+
+/* Fix for the regression container */
+.regression-container {
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+}
+
+/* Fix for any row or col components that might add margin */
+.ant-row {
+  margin-left: 0 !important;
+}
+
+.ant-col {
+  padding-left: 0 !important;
+}
+
+/* More aggressive fix for Ant Design's grid system */
+.ant-row,
+.ant-col,
+.ant-layout,
+.ant-layout-content,
+.regression-container,
+.regression-card {
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+}
+
+/* Fix for Ant Design's grid gutters */
+.ant-row > * {
+  padding-left: 0 !important;
+}
+
+/* HomePage wrapper and container */
+.home-page-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  background: #111;
+  min-height: 90vh;
+  padding: 0;
+  margin: 0;
+}
+
+.home-page-container {
+  width: 100%;
+  max-width: 1200px;
+  margin-left: 150px;
+  padding: 40px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.home-header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 40px;
+  width: 100%;
+}
+
+.logout-btn {
+  color: #ffffff;
+  font-size: 16px;
+}
+
+.welcome-section {
+  margin-bottom: 48px;
+  text-align: center;
+  width: 100%;
+}
+
+.welcome-title {
+  color: #ffffff;
+  margin-bottom: 12px;
+  font-weight: 600;
+  font-size: 32px !important;
+}
+
+.welcome-subtitle {
+  color: #aaaaaa;
+  font-size: 18px;
+}
+
+.cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+  width: 100%;
+}
+
+/* Special class for the last card when it's alone */
+.center-last-card {
+  grid-column: 1 / -1;
+  justify-self: center;
+  max-width: 300px;
+}
+
+@media (max-width: 1200px) {
+  .center-last-card {
+    max-width: 280px;
+  }
+}
+
+@media (max-width: 768px) {
+  .center-last-card {
+    max-width: 240px;
+  }
+}
+
+.card-link {
+  text-decoration: none;
+  width: 100%;
+}
+
+.home-card {
+  height: 100%;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.home-card .ant-card-body {
+  padding: 28px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.card-gradient {
+  height: 4px;
+  width: 100%;
+}
+
+.icon-circle {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  background: #252525;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.card-title {
+  color: #ffffff;
+  margin-bottom: 12px;
+  font-size: 20px !important;
+}
+
+.card-description {
+  color: #888888;
+  font-size: 15px;
+}
+
+/* Media queries for responsive design */
+@media (max-width: 1200px) {
+  .cards-container {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .cards-container {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+
+  .home-page-container {
+    padding: 30px 20px;
+  }
+}
+
+@media (max-width: 576px) {
+  .cards-container {
+    grid-template-columns: 1fr;
+  }
+
+  .home-page-container {
+    padding: 24px 16px;
+  }
+}
