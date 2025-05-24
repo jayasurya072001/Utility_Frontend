@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE_URL = 'http://localhost:5000';
+const API_BASE_URL = "http://localhost:5000";
 
 // Utility function for handling API errors
 const handleApiError = (error, customMessage = "API request failed") => {
@@ -8,7 +8,10 @@ const handleApiError = (error, customMessage = "API request failed") => {
   if (error.response) {
     return { status: error.response.status, data: error.response.data };
   }
-  return { status: 500, data: { message: "Network error or server unavailable." } };
+  return {
+    status: 500,
+    data: { message: "Network error or server unavailable." },
+  };
 };
 
 // Utility function to create axios instances with optional authorization
@@ -17,16 +20,16 @@ const createApiInstance = (withAuth = false) => {
     baseURL: API_BASE_URL,
     timeout: 30000, // Example timeout
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
   });
 
   instance.interceptors.request.use(
     (config) => {
       if (withAuth) {
-        const token = localStorage.getItem('authToken'); // Assuming you store your token here
+        const token = localStorage.getItem("authToken"); // Assuming you store your token here
         if (token) {
-          config.headers['Authorization'] = `Bearer ${token}`;
+          config.headers["Authorization"] = `Bearer ${token}`;
         }
       }
       return config;
@@ -55,15 +58,15 @@ const formDataApi = axios.create({
   baseURL: API_BASE_URL,
   timeout: 30000, // Increased timeout for file uploads
   headers: {
-    'Content-Type': 'multipart/form-data',
+    "Content-Type": "multipart/form-data",
   },
 });
 
 formDataApi.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('authToken');
+    const token = localStorage.getItem("authToken");
     if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`;
+      config.headers["Authorization"] = `Bearer ${token}`;
     }
     return config;
   },
@@ -85,14 +88,25 @@ export const fetchModels = async () => {
   }
 };
 
-export const startProcess = async (version, model, recipients, expectedScore) => {
+export const startProcess = async (
+  version,
+  model,
+  recipients,
+  expectedScore
+) => {
   const data = { version, model, recipients, expectedScore };
-  console.log("Data", data)
+  console.log("Data", data);
   try {
-    const response = await privateApi.post(`/utilities/dynamic-test/start-process`, data);
+    const response = await privateApi.post(
+      `/utilities/dynamic-test/start-process`,
+      data
+    );
     return response;
   } catch (error) {
-    if (error.response && (error.response.status === 409 || error.response.status === 400)) {
+    if (
+      error.response &&
+      (error.response.status === 409 || error.response.status === 400)
+    ) {
       console.warn("Process already exists or cannot be started.");
       return { status: error.response.status, data: error.response.data };
     }
@@ -107,17 +121,22 @@ export const runUrlModelTest = async (model, version, imageUrl) => {
       version,
       inputMediaUrl: imageUrl,
     });
-    return response.data.predictions;
-  } catch (error) {``
+    console.log("Response from URL Model Test", response.data);
+    return response.data;
+  } catch (error) {
+    ``;
     return handleApiError(error, "Error running URL Model Test");
   }
 };
 
 export const runFileModelTest = async (formData) => {
   try {
-    const response = await formDataApi.post(`/utilities/prediction/file-upload`, formData);
-    const predictions = response?.data?.predictions
-    console.log(predictions)
+    const response = await formDataApi.post(
+      `/utilities/prediction/file-upload`,
+      formData
+    );
+    const predictions = response?.data?.predictions;
+    console.log(predictions);
     return predictions;
   } catch (error) {
     return handleApiError(error, "Error running File Model Test");
@@ -126,10 +145,13 @@ export const runFileModelTest = async (formData) => {
 
 export const analysisCardHandleChange = async (chunk, inputMediaUrl) => {
   try {
-    const response = await privateApi.post("/utilities/analysis/unset-analysis", {
-      chunk: chunk,
-      inputMediaUrl: inputMediaUrl // Assuming localData is accessible in this scope
-    });
+    const response = await privateApi.post(
+      "/utilities/analysis/unset-analysis",
+      {
+        chunk: chunk,
+        inputMediaUrl: inputMediaUrl, // Assuming localData is accessible in this scope
+      }
+    );
     return response.data;
   } catch (error) {
     return handleApiError(error, "Error handling analysis card change");
@@ -138,7 +160,10 @@ export const analysisCardHandleChange = async (chunk, inputMediaUrl) => {
 
 export const proofValidation = async (data) => {
   try {
-    const response = await privateApi.post("/utilities/analysis/proof-validation", data);
+    const response = await privateApi.post(
+      "/utilities/analysis/proof-validation",
+      data
+    );
     return response.data;
   } catch (error) {
     return handleApiError(error, "Error during proof validation");
@@ -149,7 +174,7 @@ export const setNotBug = async (chunk, inputMediaUrl) => {
   try {
     const response = await privateApi.post("/utilities/analysis/set-notbug", {
       chunk: chunk,
-      inputMediaUrl: inputMediaUrl
+      inputMediaUrl: inputMediaUrl,
     });
     return response.data;
   } catch (error) {
@@ -161,7 +186,7 @@ export const setOutlier = async (chunk, inputMediaUrl) => {
   try {
     const response = await privateApi.post("/utilities/analysis/set-outlier", {
       chunk: chunk,
-      inputMediaUrl: inputMediaUrl
+      inputMediaUrl: inputMediaUrl,
     });
     return response.data;
   } catch (error) {
@@ -171,7 +196,9 @@ export const setOutlier = async (chunk, inputMediaUrl) => {
 
 export const getExpectedClasses = async (model) => {
   try {
-    const response = await privateApi.get(`/utilities/analysis/get-model-classes/${model}`);
+    const response = await privateApi.get(
+      `/utilities/analysis/get-model-classes/${model}`
+    );
     return response.data;
   } catch (error) {
     return handleApiError(error, "Error fetching expected classes");
@@ -189,7 +216,9 @@ export const getThreshold = async () => {
 
 export const getExpectedScore = async () => {
   try {
-    const response = await privateApi.get("/utilities/dynamic-test/get-expected-score");
+    const response = await privateApi.get(
+      "/utilities/dynamic-test/get-expected-score"
+    );
     return response.data;
   } catch (error) {
     return handleApiError(error, "Error fetching expected score");
@@ -197,29 +226,33 @@ export const getExpectedScore = async () => {
 };
 
 export const getChunkData = async (chunk, inputMediaUrl) => {
-  if(chunk && inputMediaUrl){
+  if (chunk && inputMediaUrl) {
     try {
-      const response = await privateApi.get(`/utilities/analysis/get-chunk/${chunk}?inputMediaUrl=${inputMediaUrl}`);
+      const response = await privateApi.get(
+        `/utilities/analysis/get-chunk/${chunk}?inputMediaUrl=${inputMediaUrl}`
+      );
       return response.data;
     } catch (error) {
       return handleApiError(error, `Error fetching chunk: ${chunk}`);
     }
-  } else if(chunk){
-    try{
-      const response = await privateApi.get(`/utilities/analysis/get-chunk/${chunk}`)
+  } else if (chunk) {
+    try {
+      const response = await privateApi.get(
+        `/utilities/analysis/get-chunk/${chunk}`
+      );
       return response.data;
-    } catch(error) {
+    } catch (error) {
       return handleApiError(error, `Error fetching chunk: ${chunk}`);
     }
   } else {
-    return {"error": "insufficient information", "status": 400}
+    return { error: "insufficient information", status: 400 };
   }
 };
 
 export const getChunks = async () => {
   try {
     const response = await privateApi.get("/utilities/analysis/get-chunks");
-    return response
+    return response;
   } catch (error) {
     return handleApiError(error, "Error fetching chunks");
   }
@@ -227,8 +260,10 @@ export const getChunks = async () => {
 
 export const getModelClasses = async (model) => {
   try {
-    const response = await privateApi.get(`/utilities/analysis/get-model-classes/${model.toLowerCase()}`);
-    console.log("Classes for model", model, ":", response.data)
+    const response = await privateApi.get(
+      `/utilities/analysis/get-model-classes/${model.toLowerCase()}`
+    );
+    console.log("Classes for model", model, ":", response.data);
     return response.data;
   } catch (error) {
     return handleApiError(error, `Error fetching classes for model: ${model}`);
@@ -245,17 +280,21 @@ export const getAllAnalysts = async () => {
 };
 
 export const setAnalyst = async (analyst, chunk) => {
-  if(analyst && chunk) {
+  if (analyst && chunk) {
     try {
-      const response = await privateApi.post('/utilities/analysis/set-analyst', {
-        analyst, chunk
-      })
-      return response
-    } catch(error) {
-      return handleApiError(error, "Error while setting analyst")
+      const response = await privateApi.post(
+        "/utilities/analysis/set-analyst",
+        {
+          analyst,
+          chunk,
+        }
+      );
+      return response;
+    } catch (error) {
+      return handleApiError(error, "Error while setting analyst");
     }
   }
-}
+};
 
 export const canMerge = async () => {
   try {
@@ -277,7 +316,9 @@ export const initiateMerge = async () => {
 
 export const getSelectedModel = async () => {
   try {
-    const response = await privateApi.get("/utilities/analysis/get-selected-model");
+    const response = await privateApi.get(
+      "/utilities/analysis/get-selected-model"
+    );
     return response.data;
   } catch (error) {
     return handleApiError(error, "Error fetching selected model");
@@ -286,8 +327,10 @@ export const getSelectedModel = async () => {
 
 export const getAllVersions = async (model) => {
   try {
-    const response = await privateApi.get(`/utilities/dynamic-test/all-versions/${model}`);
-    console.log("fetched versions for", model, ":", response.data)
+    const response = await privateApi.get(
+      `/utilities/dynamic-test/all-versions/${model}`
+    );
+    console.log("fetched versions for", model, ":", response.data);
     return response.data;
   } catch (error) {
     return handleApiError(error, `Error fetching versions for model: ${model}`);
@@ -296,7 +339,9 @@ export const getAllVersions = async (model) => {
 
 export const getRegressionReady = async () => {
   try {
-    const response = await privateApi.get("/utilities/regression-test/get-regression-ready");
+    const response = await privateApi.get(
+      "/utilities/regression-test/get-regression-ready"
+    );
     return response.data;
   } catch (error) {
     return handleApiError(error, "Error fetching regression ready status");
@@ -305,7 +350,10 @@ export const getRegressionReady = async () => {
 
 export const initiateRegressionTest = async (data = {}) => {
   try {
-    const response = await privateApi.post('/utilities/regression-test/run', data);
+    const response = await privateApi.post(
+      "/utilities/regression-test/run",
+      data
+    );
     return response;
   } catch (error) {
     return handleApiError(error, "Error initiating regression test");
@@ -314,7 +362,9 @@ export const initiateRegressionTest = async (data = {}) => {
 
 export const getSelectedVersion = async () => {
   try {
-    const response = await privateApi.get(`/utilities/dynamic-test/get-selected-version`);
+    const response = await privateApi.get(
+      `/utilities/dynamic-test/get-selected-version`
+    );
     return response.data;
   } catch (error) {
     return handleApiError(error, "Error fetching selected version");
@@ -323,7 +373,9 @@ export const getSelectedVersion = async () => {
 
 export const getRegressionModel = async () => {
   try {
-    const response = await privateApi.get("/utilities/regression-test/get-regression-model");
+    const response = await privateApi.get(
+      "/utilities/regression-test/get-regression-model"
+    );
     return response.data;
   } catch (error) {
     return handleApiError(error, "Error fetching regression model");
@@ -334,38 +386,42 @@ export const login = async (empid, password) => {
   try {
     const body = {
       emp_id: empid,
-      password, password
-    }
-    const response = await publicApi.post("/utilities/auth/login", body)
+      password,
+      password,
+    };
+    const response = await publicApi.post("/utilities/auth/login", body);
 
-    console.log("Login Response", response)
+    console.log("Login Response", response);
 
-    const { token } = response.data
+    const { token } = response.data;
 
-    return { "authToken": token };
-  } catch(error) {
+    return { authToken: token };
+  } catch (error) {
     return handleApiError(error, "Cannot Log In");
   }
 };
 
 export const register = async ({ emp_id, full_name, password, privilege }) => {
-  if(emp_id && full_name && password && privilege){
+  if (emp_id && full_name && password && privilege) {
     try {
-      const body = { emp_id, full_name, password, privilege }
+      const body = { emp_id, full_name, password, privilege };
 
-      return await privateApi.post('/utilities/auth/register', body)
-    } catch(error) {
-      return handleApiError(error, "Cannot Register")
+      return await privateApi.post("/utilities/auth/register", body);
+    } catch (error) {
+      return handleApiError(error, "Cannot Register");
     }
   }
-}
+};
 
 export const generateImageUrl = async (image) => {
   try {
     const formData = new FormData();
     formData.append("image", image);
 
-    const response = await formDataApi.post(`/utilities/generate-image-url`, formData);
+    const response = await formDataApi.post(
+      `/utilities/generate-image-url`,
+      formData
+    );
     return response.data;
   } catch (error) {
     return handleApiError(error, "Error Uploading Image");
@@ -374,11 +430,14 @@ export const generateImageUrl = async (image) => {
 
 export const startTask = async (data) => {
   try {
-    const response = await axios.post("http://54.145.248.87:5000/task/url", data)
-    console.log("Start Task Response", response)
+    const response = await axios.post(
+      "http://54.145.248.87:5000/task/url",
+      data
+    );
+    console.log("Start Task Response", response);
 
-    return response
+    return response;
   } catch (error) {
-    return handleApiError(error, "Error in Starting Task")
+    return handleApiError(error, "Error in Starting Task");
   }
-}
+};

@@ -556,3 +556,127 @@ h1 {
     padding: 24px 16px;
   }
 }
+
+/* Add these styles to ensure consistent model selector styling across the app */
+
+/* Model Version Selector Styles */
+.ant-select-dropdown {
+  background-color: #1f1f1f !important;
+  border: 1px solid #333 !important;
+  border-radius: 4px !important;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3) !important;
+}
+
+.ant-select-item {
+  color: #e0e0e0 !important;
+  transition: background-color 0.2s ease;
+}
+
+.ant-select-item-option-selected {
+  background-color: #177ddc !important;
+  color: white !important;
+}
+
+.ant-select-item-option-active:not(.ant-select-item-option-selected) {
+  background-color: #303030 !important;
+}
+
+.ant-select-selection-item {
+  color: #e0e0e0 !important;
+}
+
+.ant-select:not(.ant-select-disabled):hover .ant-select-selector {
+  border-color: #177ddc !important;
+}
+
+.ant-select-focused:not(.ant-select-disabled).ant-select:not(
+    .ant-select-customize-input
+  )
+  .ant-select-selector {
+  border-color: #177ddc !important;
+  box-shadow: 0 0 0 2px rgba(23, 125, 220, 0.2) !important;
+}
+
+/* Ensure consistent styling for all inputs */
+.ant-input,
+.ant-input-number,
+.ant-select .ant-select-selector {
+  background-color: #1a1a1a !important;
+  border-color: #333 !important;
+  color: #e0e0e0 !important;
+}
+
+.ant-input:hover,
+.ant-input-number:hover,
+.ant-select:not(.ant-select-disabled):hover .ant-select-selector {
+  border-color: #1890ff !important;
+}
+
+.ant-input:focus,
+.ant-input-number-focused,
+.ant-select-focused:not(.ant-select-disabled) .ant-select-selector {
+  border-color: #1890ff !important;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2) !important;
+}
+
+/* Consistent button styling */
+.ant-btn-primary {
+  background-color: #1890ff !important;
+  border-color: #1890ff !important;
+}
+
+.ant-btn-primary:hover {
+  background-color: #40a9ff !important;
+  border-color: #40a9ff !important;
+}
+
+/* Consistent tooltip styling */
+.ant-tooltip-inner {
+  background-color: #1f1f1f !important;
+  border: 1px solid #333 !important;
+}
+
+/* Consistent tag styling */
+.ant-tag {
+  border: 1px solid #333 !important;
+}
+
+.ant-tag-blue {
+  color: #1890ff !important;
+  background: rgba(24, 144, 255, 0.1) !important;
+  border-color: #1890ff !important;
+}
+
+.ant-tag-red {
+  color: #ff4d4f !important;
+  background: rgba(255, 77, 79, 0.1) !important;
+  border-color: #ff4d4f !important;
+}
+
+.ant-tag-green {
+  color: #52c41a !important;
+  background: rgba(82, 196, 26, 0.1) !important;
+  border-color: #52c41a !important;
+}
+
+/* Consistent notification styling */
+.ant-notification-notice {
+  background: #1a1a1a !important;
+  border: 1px solid #333 !important;
+}
+
+.ant-notification-notice-message {
+  color: #e0e0e0 !important;
+}
+
+.ant-notification-notice-description {
+  color: #aaa !important;
+}
+
+.ant-notification-notice-close {
+  color: #aaa !important;
+}
+
+.ant-notification-notice-close:hover {
+  color: #e0e0e0 !important;
+}

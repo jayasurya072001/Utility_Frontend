@@ -5,15 +5,13 @@
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  width: 100%;
-  margin-left: 0; /* Remove any left margin */
-  padding-left: 0; /* Remove left padding */
+  box-sizing: border-box;
 }
 
+/* Remove any fixed margin or width settings that might conflict */
 .regression-card {
   width: 100%;
-  max-width: 1600px; /* Increased from 1400px */
-  margin: 0 auto; /* Center the card but don't add extra left margin */
+  margin: 0;
   border-radius: 8px;
   overflow: hidden;
 }
@@ -292,4 +290,29 @@
 /* Empty state styling */
 .ant-empty-description {
   color: #aaa !important;
+}
+
+/* Add these styles to fix width inconsistencies */
+.regression-container {
+  width: 100% !important;
+  max-width: 100% !important;
+  padding: 24px !important;
+  margin: 0 !important;
+}
+
+.regression-card {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+}
+
+/* Ensure ModelsDropdown maintains consistent width */
+.ant-select,
+.ant-select-selector {
+  width: 100% !important;
+}
+
+/* Fix for the file selector */
+.agent-input {
+  width: 100% !important;
 }

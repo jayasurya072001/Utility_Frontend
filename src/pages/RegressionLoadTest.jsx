@@ -4,45 +4,58 @@ import {
   Select,
   Button,
   Card,
-  Progress,
   Typography,
   notification,
   Space,
-  Avatar,
   Divider,
   Tag,
   Spin,
   Row,
   Col,
+  Switch,
+  Slider,
+  InputNumber,
   Tooltip,
-  Statistic,
+  Avatar,
   Badge,
   Drawer,
-  List,
   Empty,
-  Switch,
+  List,
+  Progress,
+  Statistic,
+  Modal,
+  Upload,
+  message,
+  Alert,
 } from "antd";
 import {
   Send,
   Cpu,
-  HardDrive,
-  Server,
-  Activity,
   CheckCircle,
   Clock,
   AlertCircle,
   X,
   Download,
-  BarChart2,
   Settings,
-  RefreshCw,
+  Activity,
   Info,
   FileText,
-  Eye,
   Calendar,
+  HardDrive,
+  BarChart2,
+  Server,
+  RefreshCw,
+  Eye,
+  Link as LinkIcon,
+  Image,
+  UserPlus,
+  Repeat,
+  UploadCloud,
+  PlusCircle,
 } from "lucide-react";
 import axios from "axios";
-import "./RegressionLoadTest.css"; // We'll create this file for custom styles
+import "./RegressionLoadTest.css";
+import ModelsDropdown from "../components/ModelsDropdown";
 
 const { Option } = Select;
 const { Title, Text, Paragraph } = Typography;
@@ -91,7 +104,7 @@ const statusOrder = [
 ];
 
 // API endpoints
-const API_BASE_URL = "http://localhost:5050";
+const API_BASE_URL = "http://localhost:5000";
 
 // Add this helper function at the top of your component
 const formatTimestamp = (timestamp) => {
@@ -122,9 +135,35 @@ const formatTimestamp = (timestamp) => {
 };
 
 export default function RegressionLoadTest() {
+  // Add state to track sidebar collapsed status
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  // Other state variables remain the same
+
+  // Check sidebar collapsed state from localStorage
+  useEffect(() => {
+    const savedCollapsedState = localStorage.getItem("sidebarCollapsed");
+    if (savedCollapsedState !== null) {
+      setSidebarCollapsed(savedCollapsedState === "true");
+    }
+
+    // Add event listener to detect changes in localStorage
+    const handleStorageChange = (e) => {
+      if (e.key === "sidebarCollapsed") {
+        setSidebarCollapsed(e.newValue === "true");
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
+  // Calculate the left margin based on sidebar state
+  const sidebarWidth = sidebarCollapsed ? 80 : 250;
+
   // Core state
-  const [model, setModel] = useState("nudity");
-  const [version, setVersion] = useState(modelVersionMap.nudity.versions[0]);
+  const [model, setModel] = useState();
+  const [version, setVersion] = useState(null);
   const [filename, setFilename] = useState("");
   const [taskId, setTaskId] = useState(null);
   const [status, setStatus] = useState(null);
@@ -132,6 +171,7 @@ export default function RegressionLoadTest() {
   const [intervalId, setIntervalId] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [visibleStatus, setVisibleStatus] = useState([]);
+  const [isLoadingModels, setIsLoadingModels] = useState(false);
 
   // New features state
   const [recentTasks, setRecentTasks] = useState([]);
@@ -143,11 +183,61 @@ export default function RegressionLoadTest() {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [batchSize, setBatchSize] = useState(100);
 
+  // Add new state for CSV files
+  const [availableFiles, setAvailableFiles] = useState([]);
+  const [isLoadingFiles, setIsLoadingFiles] = useState(false);
+
+  // Add state for file upload modal
+  const [uploadModalVisible, setUploadModalVisible] = useState(false);
+  const [fileToUpload, setFileToUpload] = useState(null);
+  const [uploadLoading, setUploadLoading] = useState(false);
+  const [uploadError, setUploadError] = useState(null);
+  const [uploadSuggestion, setUploadSuggestion] = useState(null);
+
+  // Fetch available CSV files when model changes
+  useEffect(() => {
+    if (model) {
+      fetchAvailableFiles(model);
+    }
+  }, [model]);
+
+  // Function to fetch available CSV files for the selected model
+  const fetchAvailableFiles = async (modelName) => {
+    setIsLoadingFiles(true);
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}/utilities/regression-test/input-files?model=${modelName}`
+      );
+      if (response.data && response.data.files) {
+        setAvailableFiles(response.data.files);
+        // Auto-select the first file if available
+        if (response.data.files.length > 0) {
+          setFilename(response.data.files[0].filename);
+        } else {
+          setFilename("");
+        }
+      }
+    } catch (err) {
+      console.error("Failed to fetch available files", err);
+      notification.error({
+        message: "Agent JASU",
+        description: "Failed to retrieve available CSV files",
+        icon: <X size={16} color="#ff4d4f" />,
+      });
+      setAvailableFiles([]);
+      setFilename("");
+    } finally {
+      setIsLoadingFiles(false);
+    }
+  };
+
   // Fetch task history from API on component mount and when drawer opens
   const fetchTaskHistory = useCallback(async () => {
     setIsHistoryLoading(true);
     try {
-      const response = await axios.get(`${API_BASE_URL}/tasks`);
+      const response = await axios.get(
+        `${API_BASE_URL}/utilities/regression-test/tasks`
+      );
       if (response.data && response.data.tasks) {
         setRecentTasks(response.data.tasks);
       }
@@ -192,7 +282,7 @@ export default function RegressionLoadTest() {
     if (!filename) {
       notification.warning({
         message: "Agent JASU",
-        description: "Please enter a filename to process",
+        description: "Please select a CSV file to process",
         icon: <AlertCircle size={16} color="#faad14" />,
       });
       return;
@@ -205,13 +295,16 @@ export default function RegressionLoadTest() {
     setResultsData(null);
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/start`, {
-        model,
-        version,
-        input_filename: filename,
-        threshold: threshold,
-        batch_size: batchSize,
-      });
+      const response = await axios.post(
+        `${API_BASE_URL}/utilities/regression-test/start`,
+        {
+          model,
+          version,
+          input_filename: filename,
+          threshold: threshold,
+          batch_size: batchSize,
+        }
+      );
 
       const id = response.data.task_id;
       setTaskId(id);
@@ -239,7 +332,9 @@ export default function RegressionLoadTest() {
 
   const checkStatus = async (id) => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/status/${id}`);
+      const response = await axios.get(
+        `${API_BASE_URL}/utilities/regression-test/status/${id}`
+      );
       const responseData = response.data;
 
       // Update state with new API response format
@@ -371,7 +466,7 @@ export default function RegressionLoadTest() {
 
     // Fetch status first to get details
     axios
-      .get(`${API_BASE_URL}/status/${task.task_id}`)
+      .get(`${API_BASE_URL}/utilities/regression-test/status/${task.task_id}`)
       .then((statusResponse) => {
         setStatus(statusResponse.data.status);
         setStatusDetails(statusResponse.data.details);
@@ -386,7 +481,9 @@ export default function RegressionLoadTest() {
         setVisibleStatus(newVisibleStatus);
 
         // Then fetch results
-        return axios.get(`${API_BASE_URL}/results/${task.task_id}`);
+        return axios.get(
+          `${API_BASE_URL}/utilities/regression-test/results/${task.task_id}`
+        );
       })
       .then((resultsResponse) => {
         console.log("Historical results:", resultsResponse.data);
@@ -457,9 +554,12 @@ export default function RegressionLoadTest() {
 
     try {
       // Use axios to get the file with responseType blob
-      const response = await axios.get(`${API_BASE_URL}/download/${taskId}`, {
-        responseType: "blob", // Important for file downloads
-      });
+      const response = await axios.get(
+        `${API_BASE_URL}/utilities/regression-test/download/${taskId}`,
+        {
+          responseType: "blob", // Important for file downloads
+        }
+      );
 
       // Create a blob URL and trigger download
       const blob = new Blob([response.data], { type: "text/csv" });
@@ -487,25 +587,374 @@ export default function RegressionLoadTest() {
     }
   };
 
+  const renderFileSelector = () => (
+    <Col xs={24} md={24} lg={24} xl={24}>
+      <div className="input-label">Input Dataset</div>
+      <Select
+        placeholder={isLoadingFiles ? "Loading files..." : "Select CSV file"}
+        value={filename}
+        onChange={setFilename}
+        className="agent-input"
+        disabled={isProcessing || isLoadingFiles}
+        size="large"
+        loading={isLoadingFiles}
+        style={{ width: "100%" }}
+        suffixIcon={<FileText size={16} color="#aaa" />}
+        optionLabelProp="label"
+        dropdownRender={(menu) => (
+          <>
+            {menu}
+            <Divider style={{ margin: "8px 0", borderColor: "#333" }} />
+            <div
+              style={{
+                padding: "8px 12px",
+                cursor: "pointer",
+                color: "#1890ff",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+              }}
+              onClick={() => setUploadModalVisible(true)}
+            >
+              <PlusCircle size={16} />
+              <span>Add CSV File</span>
+            </div>
+          </>
+        )}
+      >
+        {availableFiles.map((file) => (
+          <Select.Option
+            key={file.filename}
+            value={file.filename}
+            label={file.filename}
+          >
+            <Tooltip
+              title={
+                <div>
+                  <p>
+                    <strong>Rows:</strong> {file.row_count}
+                  </p>
+                  <p>
+                    <strong>Size:</strong> {file.size}
+                  </p>
+                  <p>
+                    <strong>Modified:</strong>{" "}
+                    {new Date(file.modified).toLocaleString()}
+                  </p>
+                </div>
+              }
+              placement="right"
+            >
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <span>{file.filename}</span>
+                <span style={{ color: "#aaa", fontSize: "12px" }}>
+                  {file.row_count} rows | {file.size}
+                </span>
+              </div>
+            </Tooltip>
+          </Select.Option>
+        ))}
+      </Select>
+
+      {/* File Upload Modal */}
+      <Modal
+        title={
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+            }}
+          >
+            <UploadCloud size={20} />
+            <span style={{ color: "black" }}>Upload CSV File</span>
+          </div>
+        }
+        open={uploadModalVisible}
+        onCancel={() => {
+          setUploadModalVisible(false);
+          setFileToUpload(null);
+          setUploadError(null);
+        }}
+        footer={[
+          <Button
+            key="cancel"
+            onClick={() => {
+              setUploadModalVisible(false);
+              setFileToUpload(null);
+              setUploadError(null);
+            }}
+            style={{
+              background: "#1f1f1f",
+              borderColor: "#ff4d4f",
+              color: "#ff4d4f",
+            }}
+            icon={<X size={16} />}
+          >
+            Cancel
+          </Button>,
+          <Button
+            key="upload"
+            type="primary"
+            loading={uploadLoading}
+            onClick={handleFileUpload}
+            disabled={!fileToUpload}
+            style={{ marginLeft: "8px" }}
+          >
+            {uploadLoading ? "Uploading..." : "Upload"}
+          </Button>,
+        ]}
+        width={500}
+        bodyStyle={{
+          background: "#1a1a1a",
+          padding: "20px",
+          borderRadius: "4px",
+        }}
+        style={{
+          top: 20,
+        }}
+        maskStyle={{ background: "rgba(0, 0, 0, 0.7)" }}
+      >
+        <Space direction="vertical" style={{ width: "100%" }}>
+          {uploadError && (
+            <Alert
+              message="Upload Error"
+              description={
+                <div>
+                  <p>{uploadError}</p>
+                  {uploadSuggestion && (
+                    <p
+                      style={{
+                        marginTop: "8px",
+                        fontStyle: "italic",
+                        color: "#ffa39e",
+                      }}
+                    >
+                      <strong>Suggestion:</strong> {uploadSuggestion}
+                    </p>
+                  )}
+                </div>
+              }
+              type="error"
+              showIcon
+              style={{
+                marginBottom: "16px",
+                background: "#2a1215",
+                border: "1px solid #5c2021",
+              }}
+            />
+          )}
+
+          <Upload.Dragger
+            name="file"
+            multiple={false}
+            showUploadList={true}
+            beforeUpload={() => false}
+            onChange={handleFileSelect}
+            onRemove={() => {
+              console.log("File explicitly removed by user");
+              setFileToUpload(null);
+            }}
+            accept=".csv"
+            maxCount={1}
+            style={{
+              background: "#141414",
+              border: "1px dashed #333",
+              borderRadius: "4px",
+              padding: "20px",
+            }}
+          >
+            <p className="ant-upload-drag-icon">
+              <UploadCloud size={40} color="#1890ff" />
+            </p>
+            <p className="ant-upload-text" style={{ color: "#fff" }}>
+              Click or drag CSV file to this area to upload
+            </p>
+            <p className="ant-upload-hint" style={{ color: "#aaa" }}>
+              File must be a valid CSV for the {model} model
+            </p>
+            <p
+              className="ant-upload-hint"
+              style={{ color: "#aaa", fontSize: "12px", marginTop: "8px" }}
+            >
+              Naming format: regression_test_[optional_version]_{model}.csv
+            </p>
+          </Upload.Dragger>
+
+          {fileToUpload && (
+            <div style={{ marginTop: "16px" }}>
+              <Text type="secondary" style={{ color: "#aaa" }}>
+                Selected file:{" "}
+                <Text strong style={{ color: "#1890ff" }}>
+                  {fileToUpload.name}
+                </Text>{" "}
+                ({(fileToUpload.size / 1024).toFixed(2)} KB)
+              </Text>
+            </div>
+          )}
+        </Space>
+      </Modal>
+    </Col>
+  );
+
+  // Function to handle file upload
+  const handleFileUpload = async () => {
+    console.log("Upload button clicked, file:", fileToUpload);
+
+    if (!fileToUpload) {
+      console.error("No file to upload");
+      setUploadError("Please select a CSV file to upload");
+      setUploadSuggestion("Choose a CSV file before uploading");
+      return;
+    }
+
+    if (!model) {
+      console.error("No model selected");
+      setUploadError("Model selection is required");
+      setUploadSuggestion("Please select a model before uploading");
+      return;
+    }
+
+    setUploadLoading(true);
+    setUploadError(null);
+    setUploadSuggestion(null);
+
+    const formData = new FormData();
+    formData.append("file", fileToUpload);
+    formData.append("model", model);
+
+    console.log("Uploading file:", fileToUpload.name, "for model:", model);
+
+    try {
+      console.log(
+        "Sending request to:",
+        `${API_BASE_URL}/utilities/regression-test/upload-csv`
+      );
+
+      const response = await axios.post(
+        `${API_BASE_URL}/utilities/regression-test/upload-csv`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      console.log("Upload response:", response.data);
+
+      // Handle successful response
+      notification.success({
+        message: "Agent JASU",
+        description: response.data.message || "CSV file uploaded successfully",
+        icon: <CheckCircle size={16} color="#52c41a" />,
+      });
+
+      // Close modal and refresh file list
+      setUploadModalVisible(false);
+      setFileToUpload(null);
+      fetchAvailableFiles(model);
+    } catch (err) {
+      console.error("Upload error:", err);
+
+      if (err.response) {
+        console.error(
+          "Error response:",
+          err.response.status,
+          err.response.data
+        );
+      }
+
+      // Handle error response in the specific format
+      if (err.response && err.response.data) {
+        const errorData = err.response.data;
+        setUploadError(errorData.error || "Failed to upload file");
+
+        if (errorData.suggestion) {
+          setUploadSuggestion(errorData.suggestion);
+        }
+      } else {
+        setUploadError("Network error. Please try again.");
+        setUploadSuggestion("Check your internet connection and try again.");
+      }
+    } finally {
+      setUploadLoading(false);
+    }
+  };
+
+  // Function to handle file selection
+  const handleFileSelect = (info) => {
+    console.log("Upload info received:", info);
+
+    // Check the file status
+    if (info.file.status === "removed") {
+      console.log("File was removed");
+      setFileToUpload(null);
+      return;
+    }
+
+    // In Ant Design Upload, the file is in info.file or info.file.originFileObj
+    const file = info.file.originFileObj || info.file;
+
+    // Make sure we have a file object
+    if (!file) {
+      console.error("No file object found in the upload info");
+      return;
+    }
+
+    // Check if it's a File object with the necessary properties
+    if (!(file instanceof File) && !file.name) {
+      console.error("Invalid file object:", file);
+      return;
+    }
+
+    // Validate file type
+    if (file.type !== "text/csv" && !file.name.endsWith(".csv")) {
+      console.error("Invalid file type:", file.type, file.name);
+      setUploadError("Only CSV files are supported");
+      setUploadSuggestion("Please select a file with .csv extension");
+      setFileToUpload(null);
+      return;
+    }
+
+    console.log("File selected successfully:", file.name, file.size);
+    setFileToUpload(file);
+    setUploadError(null);
+    setUploadSuggestion(null);
+  };
+
+  // Add a useEffect to log when fileToUpload changes
+  useEffect(() => {
+    console.log(
+      "fileToUpload state updated:",
+      fileToUpload ? fileToUpload.name : "null"
+    );
+  }, [fileToUpload]);
+
   return (
-    <div className="regression-container">
+    <div
+      className="regression-container"
+      style={{
+        marginLeft: `${sidebarWidth}px`,
+        width: `calc(100% - ${sidebarWidth}px)`,
+        transition: "margin-left 0.2s, width 0.2s",
+      }}
+    >
       <Row
         gutter={[24, 24]}
-        justify="center"
-        style={{ marginLeft: 0, paddingLeft: 0 }}
+        justify="space-around"
+        style={{ width: "100%", margin: 0 }}
       >
-        <Col xs={16} lg={18} xl={20} xxl={24} style={{ paddingLeft: 0 }}>
+        <Col xs={10} lg={12} xl={14} xxl={16} style={{ padding: 0 }}>
           <Card
             className="regression-card"
             style={{
               backgroundColor: "#0a0a0a",
               border: "1px solid #333",
               boxShadow: "0 0 20px rgba(0, 150, 255, 0.2)",
-              width: "120%",
-              marginLeft: 0,
-              paddingLeft: 0,
+              width: "100%",
             }}
-            bodyStyle={{ padding: 24, paddingLeft: 24 }}
+            bodyStyle={{ padding: 24 }}
           >
             <div className="card-header">
               <div className="flex items-center mb-6">
@@ -548,86 +997,22 @@ export default function RegressionLoadTest() {
 
             <Divider style={{ borderColor: "#333" }} />
 
-            <Row gutter={[16, 16]} className="mb-4">
-              <Col xs={24} md={8}>
-                <div className="input-label">Model Type</div>
-                <Select
-                  value={model}
-                  onChange={(value) => {
-                    setModel(value);
-                    setVersion(modelVersionMap[value].versions[0]);
-                  }}
+            {/* Model, Version and Input Dataset section */}
+            <Row gutter={[16, 16]} className="mb-4" style={{ width: "100%" }}>
+              <Col xs={24} md={24} lg={24} xl={24} style={{ width: "100%" }}>
+                <div className="input-label">Model & Version</div>
+                <ModelsDropdown
+                  selectedModel={model}
+                  selectedVersion={version}
+                  onModelChange={setModel}
+                  onVersionChange={setVersion}
+                  disabled={isProcessing}
+                  size="large"
                   style={{ width: "100%" }}
-                  className="agent-select"
-                  suffixIcon={<Cpu size={16} color="#666" />}
-                  optionLabelProp="label"
-                >
-                  {Object.keys(modelVersionMap).map((modelKey) => (
-                    <Option
-                      key={modelKey}
-                      value={modelKey}
-                      label={modelKey.toUpperCase()}
-                    >
-                      <div className="select-option">
-                        <span className="option-icon">
-                          {modelVersionMap[modelKey].icon}
-                        </span>
-                        <div className="option-content">
-                          <div className="option-title">
-                            {modelKey.toUpperCase()}
-                          </div>
-                          <div className="option-desc">
-                            {modelVersionMap[modelKey].description}
-                          </div>
-                        </div>
-                      </div>
-                    </Option>
-                  ))}
-                </Select>
-              </Col>
-
-              <Col xs={24} md={8}>
-                <div className="input-label">Model Version</div>
-                <Select
-                  value={version}
-                  onChange={setVersion}
-                  style={{ width: "100%" }}
-                  className="agent-select"
-                  suffixIcon={<Activity size={16} color="#666" />}
-                >
-                  {modelVersionMap[model]?.versions.map((v) => (
-                    <Option key={v} value={v}>
-                      <div className="version-option">
-                        <Badge
-                          status="processing"
-                          color={
-                            v === modelVersionMap[model].versions[0]
-                              ? "#52c41a"
-                              : "#faad14"
-                          }
-                        />
-                        <span>{v.toUpperCase()}</span>
-                        {v === modelVersionMap[model].versions[0] && (
-                          <Tag color="green" style={{ marginLeft: 8 }}>
-                            Latest
-                          </Tag>
-                        )}
-                      </div>
-                    </Option>
-                  ))}
-                </Select>
-              </Col>
-
-              <Col xs={24} md={8}>
-                <div className="input-label">Input Dataset</div>
-                <Input
-                  placeholder="Input dataset (e.g., neural_data.csv)"
-                  value={filename}
-                  onChange={(e) => setFilename(e.target.value)}
-                  // prefix={<HardDrive size={16} color="#666" />}
-                  className="agent-input"
                 />
               </Col>
+
+              {renderFileSelector()}
             </Row>
 
             {showAdvanced && (
@@ -947,7 +1332,7 @@ export default function RegressionLoadTest() {
                   />
                   <div>
                     <Title level={5} style={{ color: "white" }}>
-                      Initializing Neural Processor
+                      Initializing Model Regression Processor
                     </Title>
                     <Text type="secondary" style={{ color: "#aaa" }}>
                       Connecting to regression analysis modules...
